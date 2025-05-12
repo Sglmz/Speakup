@@ -27,11 +27,11 @@ export default function AllCategoriesScreen() {
           <CategoryCard title="Deportes" description="Aprende sobre deportes" sub="Learn about sports" color="#A0C4FF" delay={300} />
           <CategoryCard title="Juguetes" description="Aprende sobre juguetes" sub="Learn about toys" color="#FFB3C1" delay={400} />
           <CategoryCard title="Comida" description="Aprende sobre comida" sub="Learn about food" color="#FFD700" delay={500} />
-          <CategoryCard title="Viajes" description="Aprende sobre viajes" sub="Learn about travel" color="#90EE90" delay={600} />
-          <CategoryCard title="Clima" description="Aprende sobre el clima" sub="Learn about weather" color="#ADD8E6" delay={700} />
-          <CategoryCard title="Trabajo" description="Aprende sobre profesiones" sub="Learn about professions" color="#FF6347" delay={800} />
-          <CategoryCard title="Familia" description="Aprende sobre la familia" sub="Learn about family" color="#FFDAB9" delay={900} />
-          <CategoryCard title="Tecnología" description="Aprende sobre tecnología" sub="Learn about technology" color="#98FB98" delay={1000} />
+          <CategoryCard title="Viajes" description="Aprende sobre viajes" sub="Learn about travel" color="#90EE90" delay={600} locked={true} />
+          <CategoryCard title="Clima" description="Aprende sobre el clima" sub="Learn about weather" color="#ADD8E6" delay={700} locked={true} />
+          <CategoryCard title="Trabajo" description="Aprende sobre profesiones" sub="Learn about professions" color="#FF6347" delay={800} locked={true} />
+          <CategoryCard title="Familia" description="Aprende sobre la familia" sub="Learn about family" color="#FFDAB9" delay={900} locked={true} />
+          <CategoryCard title="Tecnología" description="Aprende sobre tecnología" sub="Learn about technology" color="#98FB98" delay={1000} locked={true} />
           <CategoryCard title="Ropa" description="Aprende sobre ropa" sub="Learn about clothing" color="#D3D3D3" delay={1100} />
           <CategoryCard title="Arte" description="Aprende sobre arte" sub="Learn about art" color="#FF8C00" delay={1200} />
           <CategoryCard title="Música" description="Aprende sobre música" sub="Learn about music" color="#8A2BE2" delay={1300} />

@@ -19,8 +19,8 @@ export default function App() {
         initialRouteName="AuthChoice"
         screenOptions={{
           headerShown: true,
-          headerBackTitleVisible: false, // iOS: oculta texto del botón atrás
-          headerBackTitle: '',           // iOS: fuerza vacío
+          headerBackTitleVisible: false, 
+          headerBackTitle: '',           
           headerStyle: {
             backgroundColor: '#FFEB3B',
             elevation: 0,

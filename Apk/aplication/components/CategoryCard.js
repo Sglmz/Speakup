@@ -1,52 +1,77 @@
 import React, { useRef } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Animated } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Animated, View } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import { FontAwesome } from '@expo/vector-icons';
 
-export default function CategoryCard({ title, description, sub, color, delay, onPress }) {
-  // Creamos una referencia para la animación de escala
+export default function CategoryCard({ title, description, sub, color, delay, onPress, locked }) {
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const lockRef = useRef(null);
 
-  // Función para aumentar el tamaño de la tarjeta cuando el usuario presiona
   const handlePressIn = () => {
-    Animated.timing(scaleValue, {
-      toValue: 1.1,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
+    if (!locked) {
+      Animated.timing(scaleValue, {
+        toValue: 1.1,
+        duration: 100,
+        useNativeDriver: true,
+      }).start();
+    }
   };
 
-  // Función para restaurar el tamaño original de la tarjeta
   const handlePressOut = () => {
-    Animated.timing(scaleValue, {
-      toValue: 1,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
+    if (!locked) {
+      Animated.timing(scaleValue, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }).start();
+    }
   };
 
-  // Estilos animados
+  const handleLockedPress = () => {
+    if (locked && lockRef.current) {
+      lockRef.current.shake(500);
+    } else if (onPress) {
+      onPress();
+    }
+  };
+
   const animatedStyle = {
     transform: [{ scale: scaleValue }],
   };
 
   return (
-    <Animated.View
-      // Usamos Animated.View para aplicar las animaciones
-      animation="zoomIn"
-      delay={delay}
-      style={styles.wrapper}
-    >
+    <Animatable.View animation="fadeInUp" delay={delay} style={styles.wrapper}>
       <TouchableOpacity
-        style={[styles.card, { backgroundColor: color }]}
+        style={[styles.card, { backgroundColor: locked ? '#ccc' : color }]}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        onPress={onPress} // Evento al presionar la tarjeta
+        onPress={handleLockedPress}
         activeOpacity={0.8}
       >
-        <Animated.Text style={[styles.title, animatedStyle]}>{title}</Animated.Text>
-        <Animated.Text style={[styles.desc, animatedStyle]}>{description}</Animated.Text>
-        {sub && <Animated.Text style={[styles.sub, animatedStyle]} numberOfLines={2} ellipsizeMode="tail">{sub}</Animated.Text>}
+        {locked ? (
+          <>
+            <Animatable.View ref={lockRef}>
+              <FontAwesome name="lock" size={32} color="#555" />
+            </Animatable.View>
+            <Text style={styles.lockedText}>Nivel requerido: Medio</Text>
+          </>
+        ) : (
+          <>
+            <Animated.Text style={[styles.title, animatedStyle]}>{title}</Animated.Text>
+            <Animated.Text style={[styles.desc, animatedStyle]}>{description}</Animated.Text>
+            {sub && (
+              <Animated.Text
+                style={[styles.sub, animatedStyle]}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
+                {sub}
+              </Animated.Text>
+            )}
+          </>
+        )}
       </TouchableOpacity>
-    </Animated.View>
+    </Animatable.View>
   );
 }
 
@@ -74,6 +99,12 @@ const styles = StyleSheet.create({
   sub: {
     fontSize: 12,
     color: '#333',
-    textAlign: 'center', // Asegura que el texto esté centrado
+    textAlign: 'center',
+  },
+  lockedText: {
+    marginTop: 10,
+    fontSize: 12,
+    color: '#555',
+    textAlign: 'center',
   },
 });
