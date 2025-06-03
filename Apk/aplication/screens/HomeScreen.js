@@ -8,7 +8,6 @@ const categories = [
   { title: '1 2 3', description: 'Aprende los números', sub: 'Learn the numbers', color: '#FFD54F' },
   { title: 'ABC', description: 'Aprende las letras', sub: 'Learn the letters', color: '#FF8A65' },
   { title: 'HELLO!', description: 'Aprende palabras', sub: 'Learn words', color: '#F48FB1' },
-  { title: 'A B C D', description: 'Aprende oraciones', sub: 'Learn sentences', color: '#90CAF9' },
   { title: 'Colores', description: 'Aprende los colores', sub: 'Learn the colors', color: '#A1887F' },
   { title: 'Animales', description: 'Aprende los animales', sub: 'Learn the animals', color: '#81C784' },
 ];
@@ -50,6 +49,7 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.buttonText}>Ver todas las categorías</Text>
           </TouchableOpacity>
         </Animatable.View>
+        
       </ScrollView>
     </View>
   );
@@ -105,5 +105,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontFamily: 'Comic Sans MS',
+  },
+  // Estilos específicos para el botón del panel de usuario
+  userPanelButton: {
+    backgroundColor: '#FFAB00',
+    marginTop: 15,
+  },
+  userPanelButtonText: {
+    color: '#222',
+    fontWeight: 'bold',
   },
 });

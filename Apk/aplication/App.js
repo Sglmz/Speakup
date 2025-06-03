@@ -1,14 +1,16 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import AuthChoiceScreen from './screens/AuthChoiceScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
 import AllCategoriesScreen from './screens/AllCategoriesScreen';
+import UserPanelScreen from './screens/UserPanelScreen';
 
 const Stack = createStackNavigator();
 
@@ -19,8 +21,8 @@ export default function App() {
         initialRouteName="AuthChoice"
         screenOptions={{
           headerShown: true,
-          headerBackTitleVisible: false, 
-          headerBackTitle: '',           
+          headerBackTitleVisible: false,
+          headerBackTitle: '',
           headerStyle: {
             backgroundColor: '#FFEB3B',
             elevation: 0,
@@ -37,7 +39,6 @@ export default function App() {
           headerTitleAlign: 'center',
         }}
       >
-        {/* 🔻 Sin header solo en AuthChoice */}
         <Stack.Screen
           name="AuthChoice"
           component={AuthChoiceScreen}
@@ -59,11 +60,20 @@ export default function App() {
         <Stack.Screen
           name="Inicio"
           component={HomeScreen}
-          options={{
+          options={({ navigation }) => ({
             headerTitle: () => (
               <HeaderTitle text="¡Bienvenido usuario!" />
             ),
-          }}
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('UserPanel')}
+                style={{ marginRight: 18 }}
+                hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+              >
+                <Icon name="account-circle" size={34} color="#FFAB00" />
+              </TouchableOpacity>
+            ),
+          })}
         />
 
         <Stack.Screen
@@ -72,6 +82,16 @@ export default function App() {
           options={{
             headerTitle: () => (
               <HeaderTitle text="Categorías" />
+            ),
+          }}
+        />
+
+        <Stack.Screen
+          name="UserPanel"
+          component={UserPanelScreen}
+          options={{
+            headerTitle: () => (
+              <HeaderTitle text="Panel de Usuario" />
             ),
           }}
         />
