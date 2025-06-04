@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import AnimatedBackground from '../components/AnimatedBackground';
+import * as Animatable from 'react-native-animatable';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation , route}) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -11,10 +12,10 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} key={route?.key}>
       <AnimatedBackground />
 
-      <Text style={styles.logo}>
+      <Animatable.Text animation="fadeInDown" delay={200} style={styles.logo}>
         <Text style={styles.s}>S</Text>
         <Text style={styles.p}>P</Text>
         <Text style={styles.e}>E</Text>
@@ -22,11 +23,13 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.k}>K</Text>
         <Text style={styles.u}>U</Text>
         <Text style={styles.p2}>P</Text>
-      </Text>
+      </Animatable.Text>
 
-      <Text style={styles.subtitle}>Indícale a tus padres que te ayuden con estos datos</Text>
+      <Animatable.Text animation="fadeInDown" delay={400} style={styles.subtitle}>
+        Indícale a tus padres que te ayuden con estos datos
+      </Animatable.Text>
 
-      <View style={styles.inputContainer}>
+      <Animatable.View animation="fadeInUp" delay={600} style={styles.inputContainer}>
         <Text style={styles.icon}>👤</Text>
         <TextInput
           placeholder="Nombre de usuario"
@@ -35,9 +38,9 @@ export default function LoginScreen({ navigation }) {
           value={username}
           onChangeText={setUsername}
         />
-      </View>
+      </Animatable.View>
 
-      <View style={styles.inputContainer}>
+      <Animatable.View animation="fadeInUp" delay={750} style={styles.inputContainer}>
         <Text style={styles.icon}>🔑</Text>
         <TextInput
           placeholder="Contraseña"
@@ -47,15 +50,19 @@ export default function LoginScreen({ navigation }) {
           value={password}
           onChangeText={setPassword}
         />
-      </View>
+      </Animatable.View>
 
-      <TouchableOpacity onPress={() => { /* lógica para recuperar */ }}>
-        <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-      </TouchableOpacity>
+      <Animatable.View animation="fadeInUp" delay={950}>
+        <TouchableOpacity onPress={() => { /* lógica para recuperar */ }}>
+          <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
+      </Animatable.View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
-      </TouchableOpacity>
+      <Animatable.View animation="fadeInUp" delay={1150}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Entrar</Text>
+        </TouchableOpacity>
+      </Animatable.View>
     </View>
   );
 }

@@ -5,12 +5,11 @@ import CategoryCard from '../components/CategoryCard';
 import AnimatedBackground from '../components/AnimatedBackground';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function AllCategoriesScreen() {
+export default function AllCategoriesScreen(route) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
-      {/* Fondo animado detrás de todo */}
+    <View style={styles.container} key={route?.key}>
       <AnimatedBackground style={styles.animatedBackground} />
 
       <ScrollView

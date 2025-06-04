@@ -11,6 +11,8 @@ import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
 import AllCategoriesScreen from './screens/AllCategoriesScreen';
 import UserPanelScreen from './screens/UserPanelScreen';
+import AnimalGameIntroScreen from './screens/games/Animals/AnimalGameIntroScreen';
+import AnimalGameScreen from './screens/games/Animals/AnimalScreen';
 
 const Stack = createStackNavigator();
 
@@ -44,19 +46,16 @@ export default function App() {
           component={AuthChoiceScreen}
           options={{ headerShown: false }}
         />
-
         <Stack.Screen
           name="Login"
           component={LoginScreen}
           options={{ title: 'Iniciar Sesión' }}
         />
-
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
           options={{ title: 'Registro' }}
         />
-
         <Stack.Screen
           name="Inicio"
           component={HomeScreen}
@@ -75,7 +74,6 @@ export default function App() {
             ),
           })}
         />
-
         <Stack.Screen
           name="Todas"
           component={AllCategoriesScreen}
@@ -85,13 +83,32 @@ export default function App() {
             ),
           }}
         />
-
         <Stack.Screen
           name="UserPanel"
           component={UserPanelScreen}
           options={{
             headerTitle: () => (
               <HeaderTitle text="Panel de Usuario" />
+            ),
+          }}
+        />
+        {/* Pantalla de introducción antes del juego */}
+        <Stack.Screen
+          name="AnimalGameIntro"
+          component={AnimalGameIntroScreen}
+          options={{
+            headerTitle: () => (
+              <HeaderTitle text="Animales" />
+            ),
+          }}
+        />
+        {/* Pantalla del juego */}
+        <Stack.Screen
+          name="AnimalGame"
+          component={AnimalGameScreen}
+          options={{
+            headerTitle: () => (
+              <HeaderTitle text="Juego de Animales" />
             ),
           }}
         />

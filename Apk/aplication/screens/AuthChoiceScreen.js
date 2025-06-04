@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import AnimatedBackground from '../components/AnimatedBackground';
 import * as Animatable from 'react-native-animatable';
 
-export default function AuthChoiceScreen({ navigation }) {
+export default function AuthChoiceScreen({ navigation , route}) {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} key={route?.key}>
       <AnimatedBackground />
 
       <Animatable.Text animation="fadeInDown" delay={300} style={styles.logo}>
@@ -18,15 +18,21 @@ export default function AuthChoiceScreen({ navigation }) {
         <Text style={styles.p2}>P</Text>
       </Animatable.Text>
 
-      <Text style={styles.subtitle}>¡Indícale a tus padres que te ayuden con estos datos!</Text>
+      <Animatable.Text animation="fadeInUp" delay={700} style={styles.subtitle}>
+        ¡Indícale a tus padres que te ayuden con estos datos!
+      </Animatable.Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.buttonText}>Iniciar Sesión</Text>
-      </TouchableOpacity>
+      <Animatable.View animation="fadeInUp" delay={1000} style={{ width: '100%', alignItems: 'center' }}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+      </Animatable.View>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Register')}>
-        <Text style={styles.buttonText}>Registrarse</Text>
-      </TouchableOpacity>
+      <Animatable.View animation="fadeInUp" delay={1250} style={{ width: '100%', alignItems: 'center' }}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.buttonText}>Registrarse</Text>
+        </TouchableOpacity>
+      </Animatable.View>
     </View>
   );
 }

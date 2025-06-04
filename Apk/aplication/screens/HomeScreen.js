@@ -12,9 +12,9 @@ const categories = [
   { title: 'Animales', description: 'Aprende los animales', sub: 'Learn the animals', color: '#81C784' },
 ];
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation , route}) {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} key={route?.key}>
       <AnimatedBackground />
       <ScrollView contentContainerStyle={styles.scroll}>
         <Animatable.Text animation="bounceInDown" delay={200} style={styles.logo}>
@@ -40,6 +40,11 @@ export default function HomeScreen({ navigation }) {
               description={cat.description}
               sub={cat.sub}
               color={cat.color}
+              onPress={
+                cat.title === 'Animales'
+                  ? () => navigation.navigate('AnimalGameIntro', { progress: 0 })
+                  : undefined // Aquí puedes agregar lógica para otras categorías
+              }
             />
           ))}
         </View>
@@ -106,7 +111,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Comic Sans MS',
   },
-  // Estilos específicos para el botón del panel de usuario
   userPanelButton: {
     backgroundColor: '#FFAB00',
     marginTop: 15,

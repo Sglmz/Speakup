@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import AnimatedBackground from '../components/AnimatedBackground';
+import * as Animatable from 'react-native-animatable';
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterScreen({ navigation , route}) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,10 +13,10 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} key={route?.key}>
       <AnimatedBackground />
 
-      <Text style={styles.logo}>
+      <Animatable.Text animation="fadeInDown" delay={200} style={styles.logo}>
         <Text style={styles.s}>S</Text>
         <Text style={styles.p}>P</Text>
         <Text style={styles.e}>E</Text>
@@ -23,11 +24,13 @@ export default function RegisterScreen({ navigation }) {
         <Text style={styles.k}>K</Text>
         <Text style={styles.u}>U</Text>
         <Text style={styles.p2}>P</Text>
-      </Text>
+      </Animatable.Text>
 
-      <Text style={styles.subtitle}>¡Crea tu cuenta con ayuda de tus padres!</Text>
+      <Animatable.Text animation="fadeInDown" delay={400} style={styles.subtitle}>
+        ¡Crea tu cuenta con ayuda de tus padres!
+      </Animatable.Text>
 
-      <View style={styles.inputContainer}>
+      <Animatable.View animation="fadeInUp" delay={600} style={styles.inputContainer}>
         <Text style={styles.icon}>👤</Text>
         <TextInput
           placeholder="Nombre completo"
@@ -36,9 +39,9 @@ export default function RegisterScreen({ navigation }) {
           value={name}
           onChangeText={setName}
         />
-      </View>
+      </Animatable.View>
 
-      <View style={styles.inputContainer}>
+      <Animatable.View animation="fadeInUp" delay={750} style={styles.inputContainer}>
         <Text style={styles.icon}>✉️</Text>
         <TextInput
           placeholder="Correo electrónico"
@@ -47,9 +50,9 @@ export default function RegisterScreen({ navigation }) {
           value={email}
           onChangeText={setEmail}
         />
-      </View>
+      </Animatable.View>
 
-      <View style={styles.inputContainer}>
+      <Animatable.View animation="fadeInUp" delay={900} style={styles.inputContainer}>
         <Text style={styles.icon}>🔑</Text>
         <TextInput
           placeholder="Contraseña"
@@ -59,11 +62,13 @@ export default function RegisterScreen({ navigation }) {
           value={password}
           onChangeText={setPassword}
         />
-      </View>
+      </Animatable.View>
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Crear cuenta</Text>
-      </TouchableOpacity>
+      <Animatable.View animation="fadeInUp" delay={1150}>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>Crear cuenta</Text>
+        </TouchableOpacity>
+      </Animatable.View>
     </View>
   );
 }

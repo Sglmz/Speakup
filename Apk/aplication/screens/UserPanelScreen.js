@@ -4,24 +4,24 @@ import AnimatedBackground from '../components/AnimatedBackground';
 import * as Progress from 'react-native-progress';
 import * as Animatable from 'react-native-animatable';
 
-export default function UserPanelScreen() {
+export default function UserPanelScreen(route) {
   const nivelFacil = 0.8; // 80%
   const nivelMedio = 0.55; // 55%
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} key={route?.key}>
       <AnimatedBackground />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Animatable.Text animation="fadeInDown" delay={200} style={styles.titulo}>
           USUARIO
         </Animatable.Text>
 
-        <Text style={styles.descripcion}>
+        <Animatable.Text animation="fadeInDown" delay={400} style={styles.descripcion}>
           ESTE ES EL PANEL DEL NIÑO DONDE VA VER SU PORCENTAJE DE LOS 2 NIVELES
-        </Text>
+        </Animatable.Text>
 
         <View style={styles.graficosContainer}>
-          <View style={styles.grafico}>
+          <Animatable.View animation="fadeInUp" delay={600} style={styles.grafico}>
             <Progress.Circle
               size={220}
               progress={nivelFacil}
@@ -39,8 +39,8 @@ export default function UserPanelScreen() {
               }}
             />
             <Text style={styles.nivelText}>Nivel Fácil</Text>
-          </View>
-          <View style={styles.grafico}>
+          </Animatable.View>
+          <Animatable.View animation="fadeInUp" delay={800} style={styles.grafico}>
             <Progress.Circle
               size={220}
               progress={nivelMedio}
@@ -58,7 +58,7 @@ export default function UserPanelScreen() {
               }}
             />
             <Text style={styles.nivelText}>Nivel Medio</Text>
-          </View>
+          </Animatable.View>
         </View>
       </ScrollView>
     </View>
