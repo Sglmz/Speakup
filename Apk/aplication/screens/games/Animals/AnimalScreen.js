@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
-import { View, Modal, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Modal,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+  Dimensions,
+} from 'react-native';
+import Svg, { Polygon } from 'react-native-svg';
 import GameQuestion from '../GameQuestion1';
-import AnimatedBackground from '../../../components/AnimatedBackground';
 import * as Animatable from 'react-native-animatable';
+
+const { width, height } = Dimensions.get('window');
+const STAR_COUNT = 80;
 
 // Diccionario de traducciones
 const optionMeanings = {
@@ -16,23 +27,43 @@ export default function AnimalGameScreen({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selected, setSelected] = useState('');
   const [isCorrect, setIsCorrect] = useState(false);
+  const [stars, setStars] = useState([]);
 
-  // Se ejecuta cuando se responde (GameQuestion1 debe llamar a esto)
+  useEffect(() => {
+    const generatedStars = Array.from({ length: STAR_COUNT }, () => ({
+      x: Math.random() * width,
+      translateY: new Animated.Value(-50 - Math.random() * height),
+      speed: Math.random() * 5000 + 3000,
+    }));
+
+    generatedStars.forEach(({ translateY, speed }) => {
+      const animate = () => {
+        translateY.setValue(-50 - Math.random() * height * 0.5);
+        Animated.timing(translateY, {
+          toValue: height + 50,
+          duration: speed,
+          useNativeDriver: true,
+        }).start(animate);
+      };
+      animate();
+    });
+
+    setStars(generatedStars);
+  }, []);
+
   const handleAnswer = (correct) => {
     setIsCorrect(correct);
     setModalVisible(true);
   };
 
-  // Guarda la opción seleccionada
   const handleOptionSelect = (option) => {
     setSelected(option);
   };
 
-  // Al cerrar el popup, si está correcto navega a AnimalScreen2
   const handleContinue = () => {
     setModalVisible(false);
     if (isCorrect) {
-      navigation.replace('AnimalScreen2'); // Asegúrate que este es el nombre en tu navigator
+      navigation.replace('AnimalScreen2');
     } else {
       setSelected('');
     }
@@ -40,7 +71,29 @@ export default function AnimalGameScreen({ navigation, route }) {
 
   return (
     <View style={styles.container} key={route?.key}>
-      <AnimatedBackground style={styles.animatedBackground} />
+      {/* Fondo animado con estrellas */}
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        {stars.map((star, i) => (
+          <Animated.View
+            key={i}
+            style={[
+              styles.star,
+              {
+                left: star.x,
+                transform: [{ translateY: star.translateY }],
+              },
+            ]}
+          >
+            <Svg height="100" width="100" viewBox="0 0 40 40">
+              <Polygon
+                points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8"
+                fill="#FFF59D"
+                opacity={0.3 + Math.random() * 0.7}
+              />
+            </Svg>
+          </Animated.View>
+        ))}
+      </View>
 
       <GameQuestion
         question="¿Cómo se llama este animal?"
@@ -84,8 +137,15 @@ export default function AnimalGameScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFEB3B' },
-  animatedBackground: { ...StyleSheet.absoluteFillObject, zIndex: -1 },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFEB3B',
+  },
+  star: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.21)',
@@ -103,8 +163,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 8,
   },
-  correct: { backgroundColor: '#C8F7C5', borderColor: '#13c26e', borderWidth: 3 },
-  incorrect: { backgroundColor: '#ffb3b3', borderColor: '#c21b13', borderWidth: 3 },
+  correct: {
+    backgroundColor: '#C8F7C5',
+    borderColor: '#13c26e',
+    borderWidth: 3,
+  },
+  incorrect: {
+    backgroundColor: '#ffb3b3',
+    borderColor: '#c21b13',
+    borderWidth: 3,
+  },
   wordSelected: {
     fontSize: 24,
     color: '#ff8c00',

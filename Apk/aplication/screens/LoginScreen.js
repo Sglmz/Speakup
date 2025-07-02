@@ -8,7 +8,12 @@ export default function LoginScreen({ navigation , route}) {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    navigation.replace('Inicio');
+    const email = username.toLowerCase();
+    if (email === 'admin@speakup.com' && password === '1234') {
+      navigation.replace('AdminPanel');
+    } else {
+      navigation.replace('Inicio');
+    }
   };
 
   return (

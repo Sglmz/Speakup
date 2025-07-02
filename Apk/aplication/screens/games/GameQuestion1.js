@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, Image, StyleSheet, Animated } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 
 export default function GameQuestion({
@@ -8,45 +8,103 @@ export default function GameQuestion({
   options = [],
   correctAnswer,
   onAnswer = () => {},
+  onSelect = () => {},
+  selected,
   bgColor = '#FFEB3B',
 }) {
-  const [selected, setSelected] = useState(null);
+  const glowAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: false,
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0,
+          duration: 1500,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, []);
 
   const handlePress = (option) => {
-    setSelected(option);
-    setTimeout(() => onAnswer(option === correctAnswer), 500);
+    if (!selected) {
+      onSelect(option);
+      setTimeout(() => onAnswer(option === correctAnswer), 500);
+    }
+  };
+
+  const glowColor = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#ffa94d', '#fff59d'],
+  });
+
+  const renderConfetti = () => {
+    if (selected === correctAnswer) {
+      return (
+        <Animatable.Text
+          animation="fadeInDown"
+          iterationCount={1}
+          duration={1200}
+          style={styles.confetti}
+        >
+        </Animatable.Text>
+      );
+    }
+    return null;
   };
 
   return (
     <View style={[styles.container, { backgroundColor: bgColor }]}>
-      <Animatable.View animation="bounceInDown" duration={900}>
-        <Text style={styles.question}>{question}</Text>
-      </Animatable.View>
+      <Animated.Text
+        style={[
+          styles.question,
+          {
+            backgroundColor: glowColor,
+          },
+        ]}
+      >
+        {question}
+      </Animated.Text>
 
       <View style={styles.optionsContainer}>
-        {options.map((opt, idx) => (
-          <Animatable.View
-            animation="fadeInUp"
-            delay={400 + idx * 100}
-            key={opt}
-            style={{ width: '48%' }}
-          >
-            <TouchableOpacity
-              style={[
-                styles.optionBtn,
-                selected === opt && (opt === correctAnswer ? styles.correct : styles.incorrect),
-                { backgroundColor: '#FFD54F' }
-              ]}
-              onPress={() => handlePress(opt)}
-              disabled={selected !== null}
-              activeOpacity={0.85}
+        {options.map((opt, idx) => {
+          const isCorrect = opt === correctAnswer;
+          const isSelected = selected === opt;
+          const animationType = isSelected
+            ? isCorrect
+              ? 'tada'
+              : 'shake'
+            : 'fadeInUp';
+
+          return (
+            <Animatable.View
+              animation={animationType}
+              delay={400 + idx * 100}
+              duration={800}
+              key={opt}
+              style={{ width: '48%' }}
             >
-              <Text style={styles.optionText}>{opt}</Text>
-            </TouchableOpacity>
-          </Animatable.View>
-        ))}
+              <TouchableOpacity
+                style={[
+                  styles.optionBtn,
+                  isSelected && (isCorrect ? styles.correct : styles.incorrect),
+                ]}
+                onPress={() => handlePress(opt)}
+                disabled={!!selected}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.optionText}>{opt}</Text>
+              </TouchableOpacity>
+            </Animatable.View>
+          );
+        })}
       </View>
-      
+
       <Animatable.Image
         animation="bounceIn"
         delay={200}
@@ -54,6 +112,8 @@ export default function GameQuestion({
         style={styles.image}
         resizeMode="contain"
       />
+
+      {renderConfetti()}
     </View>
   );
 }
@@ -72,7 +132,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: '#4f2c04',
-    backgroundColor: '#ffa94d',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 14,
@@ -93,7 +152,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFD54F',
     borderRadius: 16,
     paddingVertical: 10,
-    paddingHorizontal: 0,
     marginVertical: 6,
     alignItems: 'center',
     shadowColor: '#111',
@@ -124,5 +182,10 @@ const styles = StyleSheet.create({
     width: 400,
     height: 400,
     marginTop: 0,
+  },
+  confetti: {
+    fontSize: 36,
+    position: 'absolute',
+    top: 50,
   },
 });
