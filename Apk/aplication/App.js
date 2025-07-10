@@ -13,7 +13,8 @@ import AllCategoriesScreen from './screens/AllCategoriesScreen';
 import UserPanelScreen from './screens/UserPanelScreen';
 import AnimalGameIntroScreen from './screens/games/Animals/AnimalGameIntroScreen';
 import AnimalGameScreen from './screens/games/Animals/AnimalScreen';
-import AnimalScreen2 from './screens/games/Animals/AnimalScreen2'; // <--- NUEVO IMPORT
+import AnimalScreen2 from './screens/games/Animals/AnimalScreen2';
+import AdminPanelScreen from './screens/AdminPanel'; // <-- añadido
 
 const Stack = createStackNavigator();
 
@@ -93,7 +94,6 @@ export default function App() {
             ),
           }}
         />
-        {/* Pantalla de introducción antes del juego */}
         <Stack.Screen
           name="AnimalGameIntro"
           component={AnimalGameIntroScreen}
@@ -103,7 +103,6 @@ export default function App() {
             ),
           }}
         />
-        {/* Pantalla del juego principal */}
         <Stack.Screen
           name="AnimalGame"
           component={AnimalGameScreen}
@@ -113,13 +112,21 @@ export default function App() {
             ),
           }}
         />
-        {/* Segunda pantalla del juego de animales */}
         <Stack.Screen
           name="AnimalScreen2"
           component={AnimalScreen2}
           options={{
             headerTitle: () => (
               <HeaderTitle text="Juego de Animales 2" />
+            ),
+          }}
+        />
+        <Stack.Screen
+          name="AdminPanel"
+          component={AdminPanelScreen}
+          options={{
+            headerTitle: () => (
+              <HeaderTitle text="Panel Admin" />
             ),
           }}
         />
