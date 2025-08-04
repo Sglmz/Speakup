@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Animated, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Animated } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -10,7 +10,7 @@ export default function CategoryCard({ title, description, sub, color, delay, on
   const handlePressIn = () => {
     if (!locked) {
       Animated.timing(scaleValue, {
-        toValue: 1.1,
+        toValue: 1.05,
         duration: 100,
         useNativeDriver: true,
       }).start();
@@ -46,29 +46,31 @@ export default function CategoryCard({ title, description, sub, color, delay, on
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={handleLockedPress}
-        activeOpacity={0.8}
+        activeOpacity={0.85}
       >
         {locked ? (
-          <>
-            <Animatable.View ref={lockRef}>
-              <FontAwesome name="lock" size={32} color="#555" />
-            </Animatable.View>
+          <Animatable.View ref={lockRef} style={{ alignItems: 'center' }}>
+            <FontAwesome name="lock" size={32} color="#555" />
             <Text style={styles.lockedText}>Nivel requerido: Medio</Text>
-          </>
+          </Animatable.View>
         ) : (
-          <>
-            <Animated.Text style={[styles.title, animatedStyle]}>{title}</Animated.Text>
-            <Animated.Text style={[styles.desc, animatedStyle]}>{description}</Animated.Text>
+          <Animated.View style={[animatedStyle, styles.content]}>
+            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+              {title}
+            </Text>
+            <Text style={styles.desc} numberOfLines={1} ellipsizeMode="tail">
+              {description}
+            </Text>
             {sub && (
-              <Animated.Text
-                style={[styles.sub, animatedStyle]}
+              <Text
+                style={styles.sub}
                 numberOfLines={2}
                 ellipsizeMode="tail"
               >
                 {sub}
-              </Animated.Text>
+              </Text>
             )}
-          </>
+          </Animated.View>
         )}
       </TouchableOpacity>
     </Animatable.View>
@@ -81,24 +83,34 @@ const styles = StyleSheet.create({
   },
   card: {
     width: 150,
-    height: 120,
+    height: 130,          // 🔹 Altura fija para simetría
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
     elevation: 5,
   },
+  content: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    width: '100%',
+    paddingHorizontal: 5,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 4,
   },
   desc: {
     fontSize: 14,
     textAlign: 'center',
+    marginBottom: 4,
   },
   sub: {
     fontSize: 12,
-    color: '#333',
     textAlign: 'center',
   },
   lockedText: {

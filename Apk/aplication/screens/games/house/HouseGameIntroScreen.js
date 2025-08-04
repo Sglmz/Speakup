@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AnimatedBackground from '../../../components/AnimatedBackground';
 import * as Animatable from 'react-native-animatable';
 
-export default function AnimalGameIntroScreen({ navigation, route }) {
+export default function HouseGameIntro({ navigation, route }) {
   const progress = route?.params?.progress ?? 0;
 
   return (
@@ -13,15 +13,15 @@ export default function AnimalGameIntroScreen({ navigation, route }) {
 
       <View style={styles.content}>
         <Animatable.View animation="fadeInDown" delay={100}>
-          <Icon name="paw" size={80} color="#81C784" style={{ marginBottom: 30 }} />
+          <Icon name="home-variant" size={80} color="#81C784" style={{ marginBottom: 30 }} />
         </Animatable.View>
 
         <Animatable.Text animation="fadeInDown" delay={300} style={styles.title}>
-          Animales
+          Partes de la Casa
         </Animatable.Text>
 
         <Animatable.Text animation="fadeInUp" delay={500} style={styles.subtitle}>
-          ¿Listo para aprender los animales?
+          ¿Listo para aprender las partes de la casa en inglés?
         </Animatable.Text>
 
         <Animatable.View animation="fadeInUp" delay={800} style={styles.progressBox}>
@@ -31,7 +31,7 @@ export default function AnimalGameIntroScreen({ navigation, route }) {
         <Animatable.View animation="fadeInUp" delay={1100}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.replace('AllGamesScreen')}
+            onPress={() => navigation.navigate('AllHouseGamesScreen', { categoria: 'house' })}
             activeOpacity={0.85}
           >
             <Text style={styles.buttonText}>¡Empezar!</Text>

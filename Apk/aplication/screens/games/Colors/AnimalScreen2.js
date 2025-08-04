@@ -11,12 +11,12 @@ import {
   Dimensions,
 } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
-import GameQuestion from '../GameQuestion2';
 import * as Animatable from 'react-native-animatable';
 
 const { width, height } = Dimensions.get('window');
 const STAR_COUNT = 80;
 
+// Datos del juego (colores y sus pares)
 const colors = [
   { id: '1', value: 'RED', type: 'text', pairId: 'red' },
   { id: '2', value: 'red', type: 'color', pairId: 'red' },
@@ -28,6 +28,7 @@ const colors = [
   { id: '8', value: 'yellow', type: 'color', pairId: 'yellow' },
 ];
 
+// Traducciones para feedback
 const colorTranslations = {
   red: 'rojo',
   blue: 'azul',
@@ -35,6 +36,7 @@ const colorTranslations = {
   yellow: 'amarillo',
 };
 
+// Mezclar cartas aleatoriamente
 function shuffleArray(array) {
   return array
     .map((item) => ({ ...item, sort: Math.random() }))
@@ -50,22 +52,14 @@ export default function AnimalScreen2() {
   const [lastResult, setLastResult] = useState(null);
   const [stars, setStars] = useState([]);
 
-  // Animación de glow para la indicación
+  // Glow animación para el título
   const glowAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(glowAnim, {
-          toValue: 1,
-          duration: 1500,
-          useNativeDriver: false,
-        }),
-        Animated.timing(glowAnim, {
-          toValue: 0,
-          duration: 1500,
-          useNativeDriver: false,
-        }),
+        Animated.timing(glowAnim, { toValue: 1, duration: 1500, useNativeDriver: false }),
+        Animated.timing(glowAnim, { toValue: 0, duration: 1500, useNativeDriver: false }),
       ])
     ).start();
   }, []);
@@ -101,17 +95,14 @@ export default function AnimalScreen2() {
   useEffect(() => {
     if (selectedCards.length === 2) {
       const [first, second] = selectedCards;
-      const isCorrect =
-        first.pairId === second.pairId && first.type !== second.type;
+      const isCorrect = first.pairId === second.pairId && first.type !== second.type;
 
       setTimeout(() => {
         setLastResult(isCorrect);
         setModalVisible(true);
-
         if (isCorrect) {
           setMatchedIds((prev) => [...prev, first.id, second.id]);
         }
-
         setSelectedCards([]);
       }, 600);
     }
@@ -129,24 +120,12 @@ export default function AnimalScreen2() {
 
   const handleCloseModal = () => {
     setModalVisible(false);
-
-    const totalPairs = colors.length;
-    if (matchedIds.length === totalPairs) {
+    if (matchedIds.length === colors.length) {
       setTimeout(() => {
         Alert.alert('🎉 ¡Juego completado!', 'Has emparejado todas las tarjetas.');
       }, 300);
     }
   };
-
-  const renderItem = ({ item }) => (
-    <GameQuestion
-      value={item.value}
-      type={item.type}
-      onPress={() => handlePress(item)}
-      isMatched={matchedIds.includes(item.id)}
-      isSelected={selectedCards.some((c) => c.id === item.id)}
-    />
-  );
 
   const getTranslationMessage = () => {
     const textCard = selectedCards.find((c) => c.type === 'text');
@@ -155,20 +134,52 @@ export default function AnimalScreen2() {
     return `¡Bien! ${textCard.value.toLowerCase()} significa ${translation}`;
   };
 
+  // Esta función reemplaza GameQuestion
+  const renderItem = ({ item }) => {
+    const isMatched = matchedIds.includes(item.id);
+    const isSelected = selectedCards.some((c) => c.id === item.id);
+    const selectedAnimation = isSelected ? 'pulse' : 'bounceIn';
+    const backgroundColor =
+      item.type === 'color' ? item.value :
+      isMatched ? 'rgba(182, 252, 213, 0.95)' :
+      isSelected ? '#ffe082' : '#FFD54F';
+
+    return (
+      <Animatable.View
+        animation={selectedAnimation}
+        duration={600}
+        iterationCount={isSelected ? 'infinite' : 1}
+        style={{ width: '48%' }}
+      >
+        <TouchableOpacity
+          onPress={() => handlePress(item)}
+          disabled={isMatched}
+          activeOpacity={0.85}
+          style={[
+            styles.optionBtn,
+            { backgroundColor },
+            isMatched && styles.correct,
+            isSelected && styles.selected,
+          ]}
+        >
+          {item.type === 'text' && (
+            <Text style={[styles.optionText, { color: isMatched ? item.value.toLowerCase() : '#4e342e' }]}>
+              {item.value}
+            </Text>
+          )}
+        </TouchableOpacity>
+      </Animatable.View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {/* Estrellas de fondo */}
+      {/* Estrellas flotantes */}
       <View style={StyleSheet.absoluteFill}>
         {stars.map((star, i) => (
           <Animated.View
             key={i}
-            style={[
-              styles.star,
-              {
-                left: star.x,
-                transform: [{ translateY: star.translateY }],
-              },
-            ]}
+            style={[styles.star, { left: star.x, transform: [{ translateY: star.translateY }] }]}
           >
             <Svg height="100" width="100" viewBox="0 0 40 40">
               <Polygon
@@ -181,12 +192,10 @@ export default function AnimalScreen2() {
         ))}
       </View>
 
-      {/* Título con glow */}
       <Animated.Text style={[styles.title, { backgroundColor: glowColor }]}>
         Empareja el color con su nombre
       </Animated.Text>
 
-      {/* Tarjetas */}
       <FlatList
         data={shuffledCards}
         renderItem={renderItem}
@@ -196,20 +205,15 @@ export default function AnimalScreen2() {
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
       />
 
-      {/* Modal de resultado */}
+      {/* Modal de respuesta */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <Animatable.View
             animation="zoomIn"
             duration={400}
-            style={[
-              styles.popup,
-              lastResult ? styles.correct : styles.incorrect,
-            ]}
+            style={[styles.popup, lastResult ? styles.correct : styles.incorrect]}
           >
-            {lastResult && (
-              <Text style={styles.msg}>{getTranslationMessage()}</Text>
-            )}
+            {lastResult && <Text style={styles.msg}>{getTranslationMessage()}</Text>}
             <Text style={styles.msg}>
               {lastResult
                 ? '¡Correcto! 🎉'
@@ -225,6 +229,7 @@ export default function AnimalScreen2() {
   );
 }
 
+// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -251,6 +256,35 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignSelf: 'center',
   },
+  optionBtn: {
+    borderRadius: 16,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: 25,
+    height: 80,
+    justifyContent: 'center',
+    elevation: 2,
+  },
+  optionText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'Comic Sans MS',
+    textAlign: 'center',
+  },
+  correct: {
+    shadowColor: '#13c26e',
+    shadowOpacity: 0.7,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  selected: {
+    borderWidth: 2,
+    borderColor: '#FFB300',
+    shadowColor: '#FFD700',
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 6,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.21)',
@@ -267,11 +301,6 @@ const styles = StyleSheet.create({
     shadowColor: '#222',
     shadowOpacity: 0.15,
     shadowRadius: 8,
-  },
-  correct: {
-    backgroundColor: '#C8F7C5',
-    borderColor: '#13c26e',
-    borderWidth: 3,
   },
   incorrect: {
     backgroundColor: '#ffb3b3',

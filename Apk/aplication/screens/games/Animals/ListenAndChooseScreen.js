@@ -1,32 +1,34 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
-  Modal,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Animated,
+  Modal,
   Dimensions,
-  Image,
+  Animated,
 } from 'react-native';
-import Svg, { Polygon } from 'react-native-svg';
+import { Audio } from 'expo-av';
+import { FontAwesome } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
+import Svg, { Polygon } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
 const STAR_COUNT = 80;
 
-const optionMeanings = {
-  Dog: 'Perro',
-  Pineapple: 'Piña',
-  Orange: 'Naranja',
-  Book: 'Libro',
-};
-
-export default function AnimalGameScreen({ navigation, route }) {
+export default function ListenAndChooseScreen({ navigation }) {
+  const [sound, setSound] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selected, setSelected] = useState('');
   const [isCorrect, setIsCorrect] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   const [stars, setStars] = useState([]);
+
+  const options = [
+    { id: 'dog', label: 'Dog', correct: true },
+    { id: 'tree', label: 'Tree', correct: false },
+    { id: 'pineapple', label: 'Pineapple', correct: false },
+    { id: 'book', label: 'Book', correct: false },
+  ];
 
   const glowAnim = useRef(new Animated.Value(0)).current;
 
@@ -64,36 +66,47 @@ export default function AnimalGameScreen({ navigation, route }) {
     });
 
     setStars(generatedStars);
+
+    (async () => {
+      const { sound } = await Audio.Sound.createAsync(
+        require('../../../assets/dog.gif')
+      );
+      setSound(sound);
+    })();
+
+    return () => {
+      if (sound) sound.unloadAsync();
+    };
   }, []);
 
-  const handleAnswer = (correct) => {
-    setIsCorrect(correct);
-    setModalVisible(true);
+  const handlePlay = async () => {
+    if (!sound) return;
+    await sound.replayAsync();
   };
 
-  const handleOptionSelect = (option) => {
-    if (!selected) {
-      setSelected(option);
-      setTimeout(() => handleAnswer(option === 'Dog'), 500);
-    }
+  const handleSelect = id => {
+    const opt = options.find(o => o.id === id);
+    const correct = opt?.correct === true;
+    setIsCorrect(correct);
+    setSelectedId(id);
+    setModalVisible(true);
   };
 
   const handleContinue = () => {
     setModalVisible(false);
-    if (isCorrect) {
-      navigation.replace('AllGamesScreen');
-    } else {
-      setSelected('');
+    const wasCorrect = isCorrect;
+    setSelectedId(null);
+    setIsCorrect(false);
+
+    if (wasCorrect) {
+      navigation.replace('AnimalGameScreen');
     }
   };
 
-  const options = ['Dog', 'Pineapple', 'Orange', 'Book'];
-  const image = { uri: 'https://png.pngtree.com/png-clipart/20230513/ourmid/pngtree-smile-dog-on-white-background-png-image_7096061.png' };
-
   return (
-    <View style={styles.container} key={route?.key}>
-      {/* Estrellas de fondo animadas */}
-      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+    <View style={styles.container}>
+      {/* Fondo animado */}
+      <View style={StyleSheet.absoluteFill}>
         {stars.map((star, i) => (
           <Animated.View
             key={i}
@@ -110,69 +123,54 @@ export default function AnimalGameScreen({ navigation, route }) {
         ))}
       </View>
 
-      {/* Pregunta y opciones */}
-      <Animated.Text style={[styles.question, { backgroundColor: glowColor }]}>
-        ¿Cómo se llama este animal?
+      {/* Título animado */}
+      <Animated.Text style={[styles.title, { backgroundColor: glowColor }]}>
+        ESCUCHA Y ELIGE
       </Animated.Text>
 
-      <View style={styles.optionsContainer}>
-        {options.map((opt, idx) => {
-          const isCorrectOpt = opt === 'Dog';
-          const isSelected = selected === opt;
-          const animationType = isSelected
-            ? isCorrectOpt
-              ? 'tada'
-              : 'shake'
-            : 'fadeInUp';
+      <Text style={styles.subtitle}>
+        Presiona el ícono de sonido y luego selecciona la palabra correcta.
+      </Text>
 
-          return (
-            <Animatable.View
-              animation={animationType}
-              delay={400 + idx * 100}
-              duration={800}
-              key={opt}
-              style={{ width: '48%' }}
-            >
-              <TouchableOpacity
-                style={[
-                  styles.optionBtn,
-                  isSelected && (isCorrectOpt ? styles.correct : styles.incorrect),
-                ]}
-                onPress={() => handleOptionSelect(opt)}
-                disabled={!!selected}
-                activeOpacity={0.85}
-              >
-                <Text style={styles.optionText}>{opt}</Text>
-              </TouchableOpacity>
-            </Animatable.View>
-          );
-        })}
+      <View style={styles.topRow}>
+        <TouchableOpacity onPress={handlePlay} style={styles.speakerBtn}>
+          <FontAwesome name="volume-up" size={50} color="#333" />
+        </TouchableOpacity>
       </View>
 
-      <Animatable.Image
-        animation="bounceIn"
-        delay={200}
-        source={image}
-        style={styles.image}
-        resizeMode="contain"
-      />
+      <View style={styles.optionsContainer}>
+        {options.map(opt => (
+          <TouchableOpacity
+            key={opt.id}
+            onPress={() => handleSelect(opt.id)}
+            disabled={!!selectedId}
+            style={[
+              styles.optionBtn,
+              selectedId === opt.id && isCorrect && styles.correctBtn,
+              selectedId === opt.id && !isCorrect && styles.incorrectBtn,
+            ]}
+          >
+            <Text style={styles.optionText}>{opt.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-      {/* Modal de resultado */}
+      {/* Modal de feedback */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <Animatable.View
             animation="zoomIn"
-            duration={500}
-            style={[styles.popup, isCorrect ? styles.correct : styles.incorrect]}
+            duration={400}
+            style={[
+              styles.modalBox,
+              isCorrect ? styles.modalCorrect : styles.modalIncorrect,
+            ]}
           >
-            <Text style={styles.wordSelected}>
-              {selected ? `${selected} significa ${optionMeanings[selected] || '---'}` : ''}
+            <Text style={styles.modalText}>
+              {isCorrect ? '¡Correcto!' : 'Incorrecto'}
             </Text>
-            <Text style={styles.msg}>
-              {isCorrect ? '¡Correcto!' : 'Incorrecto, intenta de nuevo'}
-            </Text>
-            <TouchableOpacity style={styles.btn} onPress={handleContinue}>
-              <Text style={styles.btnText}>
+            <TouchableOpacity style={styles.nextBtn} onPress={handleContinue}>
+              <Text style={styles.nextText}>
                 {isCorrect ? 'Continuar' : 'Reintentar'}
               </Text>
             </TouchableOpacity>
@@ -188,67 +186,74 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFEB3B',
+    padding: 16,
   },
   star: {
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  question: {
-    fontSize: 22,
+  title: {
+    fontSize: 24,
     fontWeight: 'bold',
+    fontFamily: 'Comic Sans MS',
+    textAlign: 'center',
+    marginVertical: 20,
     color: '#4f2c04',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 14,
-    textAlign: 'center',
-    fontFamily: 'Comic Sans MS',
-    marginTop: 24,
-    marginBottom: 20,
     elevation: 2,
     alignSelf: 'center',
+  },
+  subtitle: {
+    fontSize: 16,
+    fontFamily: 'Comic Sans MS',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#333',
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  speakerBtn: {
+    padding: 8,
   },
   optionsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    gap: 10,
   },
   optionBtn: {
     backgroundColor: '#FFD54F',
-    borderRadius: 16,
-    paddingVertical: 10,
+    width: (width - 64) / 2,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginBottom: 12,
     alignItems: 'center',
     shadowColor: '#111',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
-    elevation: 1,
-    marginTop: 25,
+    elevation: 2,
   },
   optionText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#4e342e',
     fontFamily: 'Comic Sans MS',
-    textAlign: 'center',
+    color: '#4e342e',
   },
-  correct: {
-    backgroundColor: '#B6FCD5',
+  correctBtn: {
+    backgroundColor: '#C8F7C5',
     borderWidth: 2,
     borderColor: '#13c26e',
   },
-  incorrect: {
+  incorrectBtn: {
     backgroundColor: '#ffb3b3',
     borderWidth: 2,
     borderColor: '#c21b13',
-  },
-  image: {
-    width: 400,
-    height: 400,
-    marginTop: 10,
-    alignSelf: 'center',
   },
   modalOverlay: {
     flex: 1,
@@ -256,43 +261,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  popup: {
+  modalBox: {
     backgroundColor: '#fff',
     padding: 32,
-    borderRadius: 26,
+    borderRadius: 20,
     alignItems: 'center',
-    width: 300,
+    width: 280,
     elevation: 10,
     shadowColor: '#222',
     shadowOpacity: 0.15,
     shadowRadius: 8,
   },
-  wordSelected: {
-    fontSize: 24,
-    color: '#ff8c00',
-    fontFamily: 'Comic Sans MS',
+  modalCorrect: {
+    borderColor: '#13c26e',
+    borderWidth: 3,
+  },
+  modalIncorrect: {
+    borderColor: '#c21b13',
+    borderWidth: 3,
+  },
+  modalText: {
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 16,
-    textAlign: 'center',
-  },
-  msg: {
-    fontSize: 19,
-    fontWeight: 'bold',
-    marginBottom: 14,
     color: '#333',
     textAlign: 'center',
   },
-  btn: {
+  nextBtn: {
     backgroundColor: '#ffe57f',
-    borderRadius: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingVertical: 10,
-    marginTop: 5,
+    borderRadius: 10,
+    marginTop: 10,
   },
-  btnText: {
-    color: '#8d6200',
-    fontWeight: 'bold',
+  nextText: {
     fontSize: 18,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    color: '#8d6200',
+    fontFamily: 'Comic Sans MS',
   },
 });

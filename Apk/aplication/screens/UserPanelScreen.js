@@ -23,7 +23,7 @@ export default function UserPanelScreen(route) {
         <View style={styles.graficosContainer}>
           <Animatable.View animation="fadeInUp" delay={600} style={styles.grafico}>
             <Progress.Circle
-              size={220}
+              size={200}
               progress={nivelFacil}
               showsText={true}
               formatText={() => `${Math.round(nivelFacil * 100)}%`}
@@ -42,7 +42,7 @@ export default function UserPanelScreen(route) {
           </Animatable.View>
           <Animatable.View animation="fadeInUp" delay={800} style={styles.grafico}>
             <Progress.Circle
-              size={220}
+              size={200}
               progress={nivelMedio}
               showsText={true}
               formatText={() => `${Math.round(nivelMedio * 100)}%`}

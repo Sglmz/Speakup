@@ -5,7 +5,7 @@ import CategoryCard from '../components/CategoryCard';
 import AnimatedBackground from '../components/AnimatedBackground';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function AllCategoriesScreen(route) {
+export default function AllCategoriesScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -21,16 +21,65 @@ export default function AllCategoriesScreen(route) {
         </Animatable.Text>
 
         <View style={styles.grid}>
-          <CategoryCard title="Hogar" description="Aprende sobre tu casa" sub="Learn about your house" color="#FFC3A0" delay={100} locked={true}/>
-          <CategoryCard title="Deportes" description="Aprende sobre deportes" sub="Learn about sports" color="#A0C4FF" delay={300} locked={true}/>
-          <CategoryCard title="Comida" description="Aprende sobre comida" sub="Learn about food" color="#FFD700" delay={500} />
-          <CategoryCard title="Clima" description="Aprende sobre el clima" sub="Learn about weather" color="#ADD8E6" delay={700} locked={true} />
-          <CategoryCard title="Trabajo" description="Aprende sobre profesiones" sub="Learn about professions" color="#FF6347" delay={800} locked={true} />
-          <CategoryCard title="Familia" description="Aprende sobre la familia" sub="Learn about family" color="#FFDAB9" delay={900} locked={true} />
-          <CategoryCard title="Tecnología" description="Aprende sobre tecnología" sub="Learn about technology" color="#98FB98" delay={1000} locked={true} />
-          <CategoryCard title="Ropa" description="Aprende sobre ropa" sub="Learn about clothing" color="#D3D3D3" delay={1100} />
-          <CategoryCard title="Música" description="Aprende sobre música" sub="Learn about music" color="#8A2BE2" delay={1300} locked={true}/>
-          <CategoryCard title="Naturaleza" description="Aprende sobre naturaleza" sub="Learn about nature" color="#32CD32" delay={1400} />
+          <CategoryCard 
+            title="Home" 
+            description="Learn about home" 
+            sub="Aprende sobre tu casa" 
+            color="#FFC3A0" 
+            delay={100} 
+            onPress={() => navigation.navigate('HouseGameIntro')} 
+          />
+          <CategoryCard 
+            title="Food" 
+            description="Learn about food" 
+            sub="Aprende sobre comida" 
+            color="#FFD700" 
+            delay={500} 
+            onPress={() => navigation.navigate('FoodGameIntro', { progress: 0 })}
+          />
+          <CategoryCard 
+            title="Weather" 
+            description="Learn weather" 
+            sub="Aprende sobre el clima" 
+            color="#ADD8E6" 
+            delay={700} 
+            onPress={() => navigation.navigate('WeatherGameIntro', { progress: 0 })}
+          />
+          <CategoryCard 
+            title="Family" 
+            description="Learn about family" 
+            sub="Aprende sobre la familia" 
+            color="#FFDAB9" 
+            delay={900} 
+            locked={true}
+            onPress={() => navigation.navigate('FamilyGameIntro', { progress: 0 })}
+          />
+          <CategoryCard 
+            title="Technology" 
+            description="Learn about technology" 
+            sub="Aprende sobre tecnología" 
+            color="#98FB98" 
+            delay={1000} 
+            locked={true}
+            onPress={() => navigation.navigate('TechnologyGameIntro', { progress: 0 })}
+          />
+          <CategoryCard 
+            title="Clothing" 
+            description="Learn clothing" 
+            sub="Aprende sobre ropa" 
+            color="#D3D3D3" 
+            delay={1100} 
+            onPress={() => navigation.navigate('ClothingGameIntro', { progress: 0 })}
+          />
+          <CategoryCard 
+            title="Nature" 
+            description="Learn about nature" 
+            sub="Aprende sobre naturaleza" 
+            color="#32CD32" 
+            delay={1400} 
+            locked={true}
+            onPress={() => navigation.navigate('NatureGameIntro', { progress: 0 })}
+          />
         </View>
       </ScrollView>
     </View>
@@ -48,7 +97,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: -1, // fondo detrás de todo
+    zIndex: -1, 
   },
   scroll: {
     alignItems: 'center',

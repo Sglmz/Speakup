@@ -5,14 +5,14 @@ import AnimatedBackground from '../components/AnimatedBackground';
 import CategoryCard from '../components/CategoryCard';
 
 const categories = [
-  { title: '1 2 3', description: 'Aprende los números', sub: 'Learn the numbers', color: '#FFD54F' },
-  { title: 'ABC', description: 'Aprende las letras', sub: 'Learn the letters', color: '#FF8A65' },
-  { title: 'HELLO!', description: 'Aprende palabras', sub: 'Learn words', color: '#F48FB1' },
-  { title: 'Colores', description: 'Aprende los colores', sub: 'Learn the colors', color: '#A1887F' },
-  { title: 'Animales', description: 'Aprende los animales', sub: 'Learn the animals', color: '#81C784' },
+  { title: '1 2 3', description: 'Learn the numbers', sub: 'Aprende los números', color: '#FFD54F' },
+  { title: 'ABC', description: 'Learn the letters', sub: 'Aprende las letras', color: '#FF8A65' },
+  { title: 'HELLO!', description: 'Learn words', sub: 'Aprende palabras', color: '#F48FB1' },
+  { title: 'Colors', description: 'Learn the colors', sub: 'Aprende los colores', color: '#A1887F' },
+  { title: 'Animals', description: 'Learn the animals', sub: 'Aprende los animales', color: '#81C784' },
 ];
 
-export default function HomeScreen({ navigation , route}) {
+export default function HomeScreen({ navigation, route }) {
   return (
     <View style={styles.container} key={route?.key}>
       <AnimatedBackground />
@@ -40,11 +40,19 @@ export default function HomeScreen({ navigation , route}) {
               description={cat.description}
               sub={cat.sub}
               color={cat.color}
-              onPress={
-                cat.title === 'Animales'
-                  ? () => navigation.navigate('AnimalGameIntro', { progress: 0 })
-                  : undefined // Aquí puedes agregar lógica para otras categorías
-              }
+              onPress={() => {
+                if (cat.title === 'Animals') {
+                  navigation.navigate('AnimalGameIntro', { progress: 0 });
+                } else if (cat.title === '1 2 3') {
+                  navigation.navigate('NumberGameIntro', { progress: 0 });
+                } else if (cat.title === 'ABC') {
+                  navigation.navigate('LettersGameIntro', { progress: 0 });
+                } else if (cat.title === 'HELLO!') {
+                  navigation.navigate('WordsGameIntroScreen', { progress: 0 });
+                } else if (cat.title === 'Colors') {
+                  navigation.navigate('ColorGameIntro', { progress: 0 });
+                }
+              }}
             />
           ))}
         </View>
@@ -54,7 +62,6 @@ export default function HomeScreen({ navigation , route}) {
             <Text style={styles.buttonText}>Ver todas las categorías</Text>
           </TouchableOpacity>
         </Animatable.View>
-        
       </ScrollView>
     </View>
   );

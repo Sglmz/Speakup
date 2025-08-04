@@ -4,17 +4,31 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import AuthChoiceScreen from './screens/AuthChoiceScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
 import AllCategoriesScreen from './screens/AllCategoriesScreen';
+import AllGamesScreen from './screens/games/Animals/AllGamesScreen';
+import AllGamesScreenNumbers from './screens/games/Numbers/AllGamesScreenNumbers';
 import UserPanelScreen from './screens/UserPanelScreen';
 import AnimalGameIntroScreen from './screens/games/Animals/AnimalGameIntroScreen';
 import AnimalGameScreen from './screens/games/Animals/AnimalScreen';
-import AnimalScreen2 from './screens/games/Animals/AnimalScreen2';
-import AdminPanelScreen from './screens/AdminPanel'; // <-- añadido
+import AnimalScreen2 from './screens/games/Colors/AnimalScreen2';
+import ListenAndChooseScreen from './screens/games/Animals/ListenAndChooseScreen';
+import AdminPanelScreen from './screens/AdminPanel';
+import NumberGameIntroScreen from './screens/games/Numbers/NumberGameIntroScreen'; 
+import ColorGameIntro from './screens/games/Colors/ColorGameIntroScreen';
+import AllGamesScreenColors from './screens/games/Colors/AllGamesScreenColors';
+import WordsGameIntro from './screens/games/words/WordsGameIntroScreen';
+import AllWordsScreen from './screens/games/words/AllWordsScreen';
+import AllLettersScreen from './screens/games/Letters/AllLettersScreen';
+import LettersGameIntro from './screens/games/Letters/LettersGameIntroScreen';
+import SpellWordScreen from './screens/games/words/WordGame1';
+import CountTapGameScreen from './screens/games/Numbers/CountTapGameScreen';
+import AllGamesScreenHouse from './screens/games/house/AllGamesScreenHouse';
+import HouseGameIntroScreen from './screens/games/house/HouseGameIntroScreen';
+import TranslateWordGame from './screens/games/house/OrderSentenceGame';
 
 const Stack = createStackNavigator();
 
@@ -80,54 +94,148 @@ export default function App() {
           name="Todas"
           component={AllCategoriesScreen}
           options={{
-            headerTitle: () => (
-              <HeaderTitle text="Categorías" />
-            ),
+            headerTitle: () => <HeaderTitle text="Categorías" />,
           }}
         />
+        <Stack.Screen
+          name="AllGamesScreen"
+          component={AllGamesScreen}
+          options={{
+            headerTitle: () => <HeaderTitle text="Juegos" />,
+          }}
+        />
+        <Stack.Screen
+          name="AllGamesScreenNumbers"
+          component={AllGamesScreenNumbers}
+          options={{
+            headerTitle: () => <HeaderTitle text="Juegos de Números" />,
+          }}
+        />
+        <Stack.Screen
+  name="AllGamesScreenColors"
+  component={AllGamesScreenColors}
+  options={{
+    headerTitle: () => <HeaderTitle text="Juegos de Colores" />,
+  }}
+/>
+<Stack.Screen
+  name="ColorGameIntro"
+  component={ColorGameIntro}
+  options={{
+    headerTitle: () => <HeaderTitle text="Colores" />,
+  }}
+/>
+<Stack.Screen
+  name="AllGamesScreenWords"
+  component={AllWordsScreen}
+  options={{
+    headerTitle: () => <HeaderTitle text="Juegos de Palabras" />,
+  }}
+/>
+<Stack.Screen
+  name="WordsGameIntroScreen"
+  component={WordsGameIntro}
+  options={{
+    headerTitle: () => <HeaderTitle text="Palabras" />,
+  }}
+/>
+<Stack.Screen
+  name="AllLettersScreen"
+  component={AllLettersScreen}
+  options={{
+    headerTitle: () => <HeaderTitle text="Juegos de Palabras" />,
+  }}
+/>
+<Stack.Screen
+  name="LettersGameIntro"
+  component={LettersGameIntro}
+  options={{
+    headerTitle: () => <HeaderTitle text="Palabras" />,
+  }}
+/>
+<Stack.Screen
+  name="WordGame1"
+  component={SpellWordScreen}
+  options={{
+    headerTitle: () => <HeaderTitle text="Juego de ordenar" />,
+  }}
+/>
+<Stack.Screen
+  name="NumberGame1"
+  component={CountTapGameScreen}
+  options={{
+    headerTitle: () => <HeaderTitle text="Juego de contar" />,
+  }}
+/>
+<Stack.Screen
+  name="AllHouseGamesScreen"
+  component={AllGamesScreenHouse}
+  options={{
+    headerTitle: () => <HeaderTitle text="Juego sobre tu casa" />,
+  }}
+/>
+<Stack.Screen
+  name="HouseGameIntro"
+  component={HouseGameIntroScreen}
+  options={{
+    headerTitle: () => <HeaderTitle text="Intro Casa" />,
+  }}
+/>
+<Stack.Screen
+  name="OrderSentence"
+  component={TranslateWordGame}
+  options={{
+    headerTitle: () => <HeaderTitle text="Ordenar Oraciones" />,
+  }}
+/>
+
         <Stack.Screen
           name="UserPanel"
           component={UserPanelScreen}
           options={{
-            headerTitle: () => (
-              <HeaderTitle text="Panel de Usuario" />
-            ),
+            headerTitle: () => <HeaderTitle text="Panel de Usuario" />,
           }}
         />
         <Stack.Screen
           name="AnimalGameIntro"
           component={AnimalGameIntroScreen}
           options={{
-            headerTitle: () => (
-              <HeaderTitle text="Animales" />
-            ),
+            headerTitle: () => <HeaderTitle text="Animales" />,
           }}
         />
         <Stack.Screen
-          name="AnimalGame"
+          name="NumberGameIntro"
+          component={NumberGameIntroScreen}
+          options={{
+            headerTitle: () => <HeaderTitle text="Números" />,
+          }}
+        />
+        <Stack.Screen
+          name="AnimalGameScreen"
           component={AnimalGameScreen}
           options={{
-            headerTitle: () => (
-              <HeaderTitle text="Juego de Animales" />
-            ),
+            headerTitle: () => <HeaderTitle text="Juego de Animales" />,
           }}
         />
         <Stack.Screen
           name="AnimalScreen2"
           component={AnimalScreen2}
           options={{
-            headerTitle: () => (
-              <HeaderTitle text="Juego de Animales 2" />
-            ),
+            headerTitle: () => <HeaderTitle text="Juego de Animales 2" />,
+          }}
+        />
+        <Stack.Screen
+          name="ListenAndChooseScreen"
+          component={ListenAndChooseScreen}
+          options={{
+            headerTitle: () => <HeaderTitle text="Juego de Escuchar y Elegir" />,
           }}
         />
         <Stack.Screen
           name="AdminPanel"
           component={AdminPanelScreen}
           options={{
-            headerTitle: () => (
-              <HeaderTitle text="Panel Admin" />
-            ),
+            headerTitle: () => <HeaderTitle text="Panel Admin" />,
           }}
         />
       </Stack.Navigator>

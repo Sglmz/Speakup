@@ -15,21 +15,28 @@ import * as Animatable from 'react-native-animatable';
 const { width, height } = Dimensions.get('window');
 const STAR_COUNT = 80;
 
-const optionMeanings = {
-  Dog: 'Perro',
-  Pineapple: 'Piña',
-  Orange: 'Naranja',
-  Book: 'Libro',
+// Diccionario de números en inglés
+const numberWords = {
+  1: "one",
+  2: "two",
+  3: "three",
+  4: "four",
+  5: "five",
+  6: "six",
+  7: "seven",
+  8: "eight",
+  9: "nine",
 };
 
-export default function AnimalGameScreen({ navigation, route }) {
+export default function CountTapGameScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selected, setSelected] = useState('');
+  const [selected, setSelected] = useState(null);
   const [isCorrect, setIsCorrect] = useState(false);
   const [stars, setStars] = useState([]);
 
   const glowAnim = useRef(new Animated.Value(0)).current;
 
+  // Animación glow
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
@@ -41,9 +48,10 @@ export default function AnimalGameScreen({ navigation, route }) {
 
   const glowColor = glowAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['#ffa94d', '#ff9b31ff'],
+    outputRange: ['#ffeb3b', '#ffd54f'],
   });
 
+  // Estrellas animadas
   useEffect(() => {
     const generatedStars = Array.from({ length: STAR_COUNT }, () => ({
       x: Math.random() * width,
@@ -66,33 +74,35 @@ export default function AnimalGameScreen({ navigation, route }) {
     setStars(generatedStars);
   }, []);
 
+  // Pregunta
+  const correctAnswer = 5;
+  const options = [3, 5, 7, 9];
+
   const handleAnswer = (correct) => {
     setIsCorrect(correct);
     setModalVisible(true);
   };
 
   const handleOptionSelect = (option) => {
-    if (!selected) {
+    if (selected === null) {
       setSelected(option);
-      setTimeout(() => handleAnswer(option === 'Dog'), 500);
+      setTimeout(() => handleAnswer(option === correctAnswer), 500);
     }
   };
 
+  // ✅ Aquí corregimos la navegación usando navigate
   const handleContinue = () => {
     setModalVisible(false);
     if (isCorrect) {
-      navigation.replace('AllGamesScreen');
+      navigation.navigate('AllGamesScreenNumbers', { categoria: 'numeros' });
     } else {
-      setSelected('');
+      setSelected(null);
     }
   };
 
-  const options = ['Dog', 'Pineapple', 'Orange', 'Book'];
-  const image = { uri: 'https://png.pngtree.com/png-clipart/20230513/ourmid/pngtree-smile-dog-on-white-background-png-image_7096061.png' };
-
   return (
-    <View style={styles.container} key={route?.key}>
-      {/* Estrellas de fondo animadas */}
+    <View style={styles.container}>
+      {/* Estrellas */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         {stars.map((star, i) => (
           <Animated.View
@@ -110,54 +120,49 @@ export default function AnimalGameScreen({ navigation, route }) {
         ))}
       </View>
 
-      {/* Pregunta y opciones */}
       <Animated.Text style={[styles.question, { backgroundColor: glowColor }]}>
-        ¿Cómo se llama este animal?
+        ¿Cuántas manzanas hay?
       </Animated.Text>
 
+      {/* Mostrar las manzanas */}
+      <View style={styles.imageContainer}>
+        {[...Array(correctAnswer)].map((_, idx) => (
+          <Image
+            key={idx}
+            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg' }}
+            style={styles.apple}
+          />
+        ))}
+      </View>
+
+      {/* Opciones en inglés */}
       <View style={styles.optionsContainer}>
         {options.map((opt, idx) => {
-          const isCorrectOpt = opt === 'Dog';
           const isSelected = selected === opt;
           const animationType = isSelected
-            ? isCorrectOpt
+            ? opt === correctAnswer
               ? 'tada'
               : 'shake'
             : 'fadeInUp';
 
           return (
-            <Animatable.View
-              animation={animationType}
-              delay={400 + idx * 100}
-              duration={800}
-              key={opt}
-              style={{ width: '48%' }}
-            >
+            <Animatable.View animation={animationType} delay={300 + idx * 100} key={opt} style={{ width: '48%' }}>
               <TouchableOpacity
                 style={[
                   styles.optionBtn,
-                  isSelected && (isCorrectOpt ? styles.correct : styles.incorrect),
+                  isSelected && (opt === correctAnswer ? styles.correct : styles.incorrect),
                 ]}
                 onPress={() => handleOptionSelect(opt)}
-                disabled={!!selected}
-                activeOpacity={0.85}
+                disabled={selected !== null}
               >
-                <Text style={styles.optionText}>{opt}</Text>
+                <Text style={styles.optionText}>{numberWords[opt]}</Text>
               </TouchableOpacity>
             </Animatable.View>
           );
         })}
       </View>
 
-      <Animatable.Image
-        animation="bounceIn"
-        delay={200}
-        source={image}
-        style={styles.image}
-        resizeMode="contain"
-      />
-
-      {/* Modal de resultado */}
+      {/* Modal resultado */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <Animatable.View
@@ -165,15 +170,12 @@ export default function AnimalGameScreen({ navigation, route }) {
             duration={500}
             style={[styles.popup, isCorrect ? styles.correct : styles.incorrect]}
           >
-            <Text style={styles.wordSelected}>
-              {selected ? `${selected} significa ${optionMeanings[selected] || '---'}` : ''}
-            </Text>
             <Text style={styles.msg}>
-              {isCorrect ? '¡Correcto!' : 'Incorrecto, intenta de nuevo'}
+              {isCorrect ? '✅ Correct!' : '❌ Try again'}
             </Text>
             <TouchableOpacity style={styles.btn} onPress={handleContinue}>
               <Text style={styles.btnText}>
-                {isCorrect ? 'Continuar' : 'Reintentar'}
+                {isCorrect ? 'Continue' : 'Retry'}
               </Text>
             </TouchableOpacity>
           </Animatable.View>
@@ -183,31 +185,26 @@ export default function AnimalGameScreen({ navigation, route }) {
   );
 }
 
-// Estilos
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFEB3B',
-  },
-  star: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  container: { flex: 1, backgroundColor: '#FFEB3B', paddingTop: 40 },
+  star: { position: 'absolute' },
   question: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#4f2c04',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    padding: 12,
     borderRadius: 14,
     textAlign: 'center',
-    fontFamily: 'Comic Sans MS',
-    marginTop: 24,
     marginBottom: 20,
-    elevation: 2,
     alignSelf: 'center',
   },
+  imageContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  apple: { width: 60, height: 60, margin: 5, borderRadius: 10 },
   optionsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -220,42 +217,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingVertical: 10,
     alignItems: 'center',
-    shadowColor: '#111',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 1,
-    marginTop: 25,
+    marginTop: 20,
   },
-  optionText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#4e342e',
-    fontFamily: 'Comic Sans MS',
-    textAlign: 'center',
-  },
-  correct: {
-    backgroundColor: '#B6FCD5',
-    borderWidth: 2,
-    borderColor: '#13c26e',
-  },
-  incorrect: {
-    backgroundColor: '#ffb3b3',
-    borderWidth: 2,
-    borderColor: '#c21b13',
-  },
-  image: {
-    width: 400,
-    height: 400,
-    marginTop: 10,
-    alignSelf: 'center',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.21)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  optionText: { fontSize: 18, fontWeight: 'bold', color: '#4e342e', textTransform: 'capitalize' },
+  correct: { backgroundColor: '#B6FCD5', borderWidth: 2, borderColor: '#13c26e' },
+  incorrect: { backgroundColor: '#ffb3b3', borderWidth: 2, borderColor: '#c21b13' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.21)', alignItems: 'center', justifyContent: 'center' },
   popup: {
     backgroundColor: '#fff',
     padding: 32,
@@ -263,36 +230,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 300,
     elevation: 10,
-    shadowColor: '#222',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
   },
-  wordSelected: {
-    fontSize: 24,
-    color: '#ff8c00',
-    fontFamily: 'Comic Sans MS',
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  msg: {
-    fontSize: 19,
-    fontWeight: 'bold',
-    marginBottom: 14,
-    color: '#333',
-    textAlign: 'center',
-  },
-  btn: {
-    backgroundColor: '#ffe57f',
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    marginTop: 5,
-  },
-  btnText: {
-    color: '#8d6200',
-    fontWeight: 'bold',
-    fontSize: 18,
-    textAlign: 'center',
-  },
+  msg: { fontSize: 20, fontWeight: 'bold', marginBottom: 14, color: '#333', textAlign: 'center' },
+  btn: { backgroundColor: '#ffe57f', borderRadius: 12, paddingHorizontal: 20, paddingVertical: 10, marginTop: 5 },
+  btnText: { color: '#8d6200', fontWeight: 'bold', fontSize: 18 },
 });

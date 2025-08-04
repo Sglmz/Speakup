@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AnimatedBackground from '../../../components/AnimatedBackground';
 import * as Animatable from 'react-native-animatable';
 
-export default function AnimalGameIntroScreen({ navigation, route }) {
+export default function WordsGameIntro({ navigation, route }) {
   const progress = route?.params?.progress ?? 0;
 
   return (
@@ -13,15 +13,15 @@ export default function AnimalGameIntroScreen({ navigation, route }) {
 
       <View style={styles.content}>
         <Animatable.View animation="fadeInDown" delay={100}>
-          <Icon name="paw" size={80} color="#81C784" style={{ marginBottom: 30 }} />
+          <Icon name="format-letter-case" size={80} color="#81C784" style={{ marginBottom: 30 }} />
         </Animatable.View>
 
         <Animatable.Text animation="fadeInDown" delay={300} style={styles.title}>
-          Animales
+          Palabras
         </Animatable.Text>
 
         <Animatable.Text animation="fadeInUp" delay={500} style={styles.subtitle}>
-          ¿Listo para aprender los animales?
+          ¿Listo para aprender nuevas palabras en inglés?
         </Animatable.Text>
 
         <Animatable.View animation="fadeInUp" delay={800} style={styles.progressBox}>
@@ -31,7 +31,7 @@ export default function AnimalGameIntroScreen({ navigation, route }) {
         <Animatable.View animation="fadeInUp" delay={1100}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.replace('AllGamesScreen')}
+            onPress={() => navigation.replace('AllGamesScreenWords', { categoria: 'palabras' })}
             activeOpacity={0.85}
           >
             <Text style={styles.buttonText}>¡Empezar!</Text>
