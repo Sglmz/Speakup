@@ -1,21 +1,50 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import AnimatedBackground from '../components/AnimatedBackground';
 import * as Animatable from 'react-native-animatable';
+import { API_URL } from '../config';
 
-export default function RegisterScreen({ navigation , route}) {
+export default function RegisterScreen({ navigation, route }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegister = () => {
-    navigation.replace('Inicio');
+  const handleRegister = async () => {
+    try {
+      const response = await fetch(`${API_URL}/register.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: name,
+          email: email,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        alert('Registro exitoso');
+        navigation.navigate('Login'); // ✅ Usa navigate aquí
+      } else {
+        alert(data.message || 'Error al registrar');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error de conexión con el servidor');
+    }
   };
 
   return (
     <View style={styles.container} key={route?.key}>
       <AnimatedBackground />
-
       <Animatable.Text animation="fadeInDown" delay={200} style={styles.logo}>
         <Text style={styles.s}>S</Text>
         <Text style={styles.p}>P</Text>
@@ -25,7 +54,6 @@ export default function RegisterScreen({ navigation , route}) {
         <Text style={styles.u}>U</Text>
         <Text style={styles.p2}>P</Text>
       </Animatable.Text>
-
       <Animatable.Text animation="fadeInDown" delay={400} style={styles.subtitle}>
         ¡Crea tu cuenta con ayuda de tus padres!
       </Animatable.Text>

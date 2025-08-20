@@ -1,0 +1,6 @@
+[2025-08-19 23:04:27] 📥 Inicio de ver_progreso
+🔹 user_id recibido: '5'
+✅ Progreso enviado correctamente
+[2025-08-19 23:06:27] 📥 Inicio de ver_progreso
+🔹 user_id recibido: '5'
+✅ Progreso enviado correctamente

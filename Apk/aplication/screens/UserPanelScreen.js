@@ -1,117 +1,92 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import AnimatedBackground from '../components/AnimatedBackground';
 import * as Progress from 'react-native-progress';
 import * as Animatable from 'react-native-animatable';
+import { API_URL } from '../config';
 
-export default function UserPanelScreen(route) {
-  const nivelFacil = 0.8; // 80%
-  const nivelMedio = 0.55; // 55%
+export default function UserPanelScreen({ route }) {
+  const { username, userId } = route.params;
+  const [progresoTotal, setProgresoTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_URL}/get_progreso.php?user_id=${userId}`)
+      .then(res => res.json())
+      .then(json => {
+        if (json.status === 'error') {
+          console.warn('⚠️ Respuesta inesperada:', json);
+          return;
+        }
+
+        // Calcular total general
+        let completados = 0, total = 0;
+        json.forEach(n => {
+          completados += n.completados;
+          total += n.total;
+        });
+
+        const porcentaje = total ? completados / total : 0;
+        setProgresoTotal(porcentaje);
+      })
+      .catch(err => console.error('❌ Error al obtener progreso:', err))
+      .finally(() => setLoading(false));
+  }, [userId]);
 
   return (
-    <View style={styles.container} key={route?.key}>
-      <AnimatedBackground />
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Animatable.Text animation="fadeInDown" delay={200} style={styles.titulo}>
-          USUARIO
+    <View style={s.c}>
+      <AnimatedBackground style={StyleSheet.absoluteFillObject} />
+      <ScrollView contentContainerStyle={s.s} showsVerticalScrollIndicator={false}>
+        <Animatable.Text animation="fadeInDown" delay={200} style={s.t}>
+          {username}
+        </Animatable.Text>
+        <Animatable.Text animation="fadeInDown" delay={400} style={s.d}>
+          Bienvenido {username}, este es tu progreso general:
         </Animatable.Text>
 
-        <Animatable.Text animation="fadeInDown" delay={400} style={styles.descripcion}>
-          ESTE ES EL PANEL DEL NIÑO DONDE VA VER SU PORCENTAJE DE LOS 2 NIVELES
-        </Animatable.Text>
-
-        <View style={styles.graficosContainer}>
-          <Animatable.View animation="fadeInUp" delay={600} style={styles.grafico}>
-            <Progress.Circle
-              size={200}
-              progress={nivelFacil}
-              showsText={true}
-              formatText={() => `${Math.round(nivelFacil * 100)}%`}
-              color="#FFAB00"
-              borderWidth={3}
-              thickness={16}
-              unfilledColor="#fff"
-              textStyle={{
-                fontFamily: 'Comic Sans MS',
-                fontWeight: 'bold',
-                fontSize: 42,
-                color: '#222'
-              }}
-            />
-            <Text style={styles.nivelText}>Nivel Fácil</Text>
-          </Animatable.View>
-          <Animatable.View animation="fadeInUp" delay={800} style={styles.grafico}>
-            <Progress.Circle
-              size={200}
-              progress={nivelMedio}
-              showsText={true}
-              formatText={() => `${Math.round(nivelMedio * 100)}%`}
-              color="#3F51B5"
-              borderWidth={3}
-              thickness={16}
-              unfilledColor="#fff"
-              textStyle={{
-                fontFamily: 'Comic Sans MS',
-                fontWeight: 'bold',
-                fontSize: 42,
-                color: '#222'
-              }}
-            />
-            <Text style={styles.nivelText}>Nivel Medio</Text>
-          </Animatable.View>
-        </View>
+        <Animatable.View animation="fadeInUp" delay={600} style={s.g}>
+          {loading ? (
+            <ActivityIndicator size="large" color="#FF5722" />
+          ) : (
+            <>
+              <Progress.Circle
+                size={200}
+                progress={progresoTotal}
+                showsText
+                formatText={() => `${Math.round(progresoTotal * 100)}%`}
+                color="#FFAB00"
+                borderWidth={3}
+                thickness={16}
+                unfilledColor="#fff"
+                textStyle={s.txt}
+              />
+              <Text style={s.n}>Progreso Global</Text>
+            </>
+          )}
+        </Animatable.View>
       </ScrollView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFEB3B',
+const s = StyleSheet.create({
+  c: { flex: 1, backgroundColor: '#FFEB3B' },
+  s: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 16 },
+  t: {
+    fontSize: 36, fontWeight: 'bold', fontFamily: 'Comic Sans MS',
+    color: '#222', marginBottom: 18, textAlign: 'center', letterSpacing: 2,
   },
-  scrollContent: {
-    alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 16,
-    minHeight: '100%',
+  d: {
+    fontFamily: 'Comic Sans MS', fontSize: 18, color: '#333',
+    textAlign: 'center', marginBottom: 30,
   },
-  titulo: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    fontFamily: 'Comic Sans MS',
-    color: '#222',
-    marginTop: 10,
-    marginBottom: 18,
-    textAlign: 'center',
-    letterSpacing: 2,
+  g: { alignItems: 'center', marginTop: 12 },
+  n: {
+    marginTop: 18, fontFamily: 'Comic Sans MS', fontSize: 28,
+    color: '#222', fontWeight: 'bold', textAlign: 'center',
   },
-  descripcion: {
-    fontFamily: 'Comic Sans MS',
-    fontSize: 18,
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 30,
-    marginHorizontal: 10,
-  },
-  graficosContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    marginTop: 12,
-    gap: 38,
-  },
-  grafico: {
-    alignItems: 'center',
-    marginVertical: 14,
-  },
-  nivelText: {
-    marginTop: 18,
-    fontFamily: 'Comic Sans MS',
-    fontSize: 28,
-    color: '#222',
-    fontWeight: 'bold',
-    textAlign: 'center',
+  txt: {
+    fontFamily: 'Comic Sans MS', fontWeight: 'bold',
+    fontSize: 42, color: '#222',
   },
 });

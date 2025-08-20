@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  Dimensions,
+  View, Text, TextInput, TouchableOpacity,
+  StyleSheet, Animated, Dimensions, Alert
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Svg, { Polygon } from 'react-native-svg';
+import { API_URL } from '../config';
 
 const { width, height } = Dimensions.get('window');
 const STAR_COUNT = 80;
@@ -41,14 +37,36 @@ export default function LoginScreen({ navigation, route }) {
     setStars(generatedStars);
   }, []);
 
-  const handleLogin = () => {
-    const email = username.toLowerCase();
-    if (email === 'admin@speakup.com' && password === '1234') {
-      navigation.replace('AdminPanel');
-    } else {
-      navigation.replace('Inicio');
-    }
-  };
+ const handleLogin = async () => {
+  try {
+    const response = await fetch(`${API_URL}/login.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: username,
+        password: password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.status === 'success') {
+  if (data.level === 'admin') {
+    navigation.replace('AdminPanel');
+  } else {
+    navigation.replace('Inicio', {
+      username: data.username,
+      userId: data.id
+    });
+  }
+} else {
+  alert('Correo o contraseña incorrectos');
+}
+  } catch (error) {
+    console.error(error);
+    alert('Error de conexión con el servidor');
+  }
+};
 
   return (
     <View style={styles.container} key={route?.key}>
@@ -57,13 +75,7 @@ export default function LoginScreen({ navigation, route }) {
         {stars.map((star, i) => (
           <Animated.View
             key={i}
-            style={[
-              styles.star,
-              {
-                left: star.x,
-                transform: [{ translateY: star.translateY }],
-              },
-            ]}
+            style={[styles.star, { left: star.x, transform: [{ translateY: star.translateY }] }]}
           >
             <Svg height="100" width="100" viewBox="0 0 40 40">
               <Polygon
@@ -130,73 +142,16 @@ export default function LoginScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFEB3B',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  star: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    fontFamily: 'Comic Sans MS',
-    marginBottom: 10,
-  },
-  s: { color: '#FF5722' },
-  p: { color: '#FF5722' },
-  e: { color: '#F44336' },
-  a: { color: '#2962FF' },
-  k: { color: '#ffffff' },
-  u: { color: '#FFAB00' },
-  p2: { color: '#FFAB00' },
-  subtitle: {
-    fontFamily: 'Comic Sans MS',
-    fontSize: 14,
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 30,
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    width: '90%',
-    elevation: 2,
-  },
-  icon: {
-    fontSize: 18,
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    fontFamily: 'Comic Sans MS',
-    fontSize: 16,
-    paddingVertical: 10,
-    color: '#000',
-  },
-  link: {
-    color: '#000',
-    fontFamily: 'Comic Sans MS',
-    textDecorationLine: 'underline',
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#3F51B5',
-    borderRadius: 25,
-    paddingVertical: 12,
-    paddingHorizontal: 40,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontFamily: 'Comic Sans MS',
-  },
+  container: { flex: 1, backgroundColor: '#FFEB3B', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 },
+  star: { position: 'absolute', justifyContent: 'center', alignItems: 'center' },
+  logo: { fontSize: 42, fontWeight: 'bold', fontFamily: 'Comic Sans MS', marginBottom: 10 },
+  s: { color: '#FF5722' }, p: { color: '#FF5722' }, e: { color: '#F44336' },
+  a: { color: '#2962FF' }, k: { color: '#ffffff' }, u: { color: '#FFAB00' }, p2: { color: '#FFAB00' },
+  subtitle: { fontFamily: 'Comic Sans MS', fontSize: 14, marginBottom: 30, textAlign: 'center' },
+  inputContainer: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 30, alignItems: 'center', paddingHorizontal: 15, marginBottom: 15, width: '90%', elevation: 2 },
+  icon: { fontSize: 18, marginRight: 10 },
+  input: { flex: 1, fontFamily: 'Comic Sans MS', fontSize: 16, paddingVertical: 10, color: '#000' },
+  link: { color: '#000', fontFamily: 'Comic Sans MS', textDecorationLine: 'underline', marginBottom: 20 },
+  button: { backgroundColor: '#3F51B5', borderRadius: 25, paddingVertical: 12, paddingHorizontal: 40 },
+  buttonText: { color: '#fff', fontSize: 18, fontFamily: 'Comic Sans MS' },
 });

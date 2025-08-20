@@ -1,0 +1,1 @@
+export const API_URL = 'http://192.242.6.149/SpeakupApi/';

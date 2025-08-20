@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -15,39 +15,85 @@ import Svg, { Polygon } from 'react-native-svg';
 const { width, height } = Dimensions.get('window');
 const STAR_COUNT = 80;
 
+// Utilidades
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+// Crear un banco de letras que SIEMPRE incluye todas las letras (con repeticiones) del target.
+// Agrega N distractores y baraja.
+function buildLetterBank(target, extraCount = 3) {
+  const t = target.toUpperCase();
+  const base = t.split(''); // incluye duplicados
+  const setInTarget = new Set(base);
+
+  // Generar distractores que no estén repetidos en exceso
+  const candidates = ALPHABET.filter((c) => !setInTarget.has(c));
+  const extras = [];
+  for (let i = 0; i < extraCount && candidates.length > 0; i++) {
+    const idx = Math.floor(Math.random() * candidates.length);
+    extras.push(candidates.splice(idx, 1)[0]);
+  }
+
+  const combined = [...base, ...extras].map((char, i) => ({
+    id: `${char}-${i}-${Math.random().toString(36).slice(2, 7)}`,
+    char,
+    used: false,
+  }));
+
+  // Fisher-Yates shuffle
+  for (let i = combined.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [combined[i], combined[j]] = [combined[j], combined[i]];
+  }
+  return combined;
+}
+
 export default function TranslateWordGame() {
-  const questions = [
-    {
-      sentence: "She plays guitar in the",
-      translation: "Ella toca guitarra en la sala",
-      target: "LIVINGROOM",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQynKd7-nYOz9wFCSbAfPBPqikX2YvR-Bpf2A&s",
-      letters: ["L", "V", "G", "O", "R", "O", "M", "I", "N"]
-    },
-    {
-      sentence: "He cooks in the",
-      translation: "Él cocina en la cocina",
-      target: "KITCHEN",
-      image: "https://img.freepik.com/premium-vector/kitchen-with-stove-oven-stove-window_1025542-70867.jpg",
-      letters: ["O", "E", "C", "T", "H", "I", "N", "A", "K"]
-    },
-    {
-      sentence: "I sleep in the",
-      translation: "Yo duermo en el dormitorio",
-      target: "BEDROOM",
-      image: "https://t3.ftcdn.net/jpg/02/00/48/10/360_F_200481040_e36DewfQr2xDonN5IOQxGgFUsoZSqHiK.jpg",
-      letters: ["B", "M", "D", "B", "O", "S", "E", "A"]
-    },
-  ];
+  const questions = useMemo(
+    () => [
+      {
+        sentence: 'She plays guitar in the',
+        translation: 'Ella toca guitarra en la sala',
+        target: 'LIVINGROOM', // L I V I N G R O O M (10)
+        image:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQynKd7-nYOz9wFCSbAfPBPqikX2YvR-Bpf2A&s',
+      },
+      {
+        sentence: 'He cooks in the',
+        translation: 'Él cocina en la cocina',
+        target: 'KITCHEN', // 7
+        image:
+          'https://img.freepik.com/premium-vector/kitchen-with-stove-oven-stove-window_1025542-70867.jpg',
+      },
+      {
+        sentence: 'I sleep in the',
+        translation: 'Yo duermo en el dormitorio',
+        target: 'BEDROOM', // B E D R O O M (7)
+        image:
+          'https://t3.ftcdn.net/jpg/02/00/48/10/360_F_200481040_e36DewfQr2xDonN5IOQxGgFUsoZSqHiK.jpg',
+      },
+    ],
+    []
+  );
 
   const [current, setCurrent] = useState(0);
-  const [progress, setProgress] = useState("");
+  const [progress, setProgress] = useState(''); // lo ya armado
   const [modalVisible, setModalVisible] = useState(false);
+  const [usedStack, setUsedStack] = useState([]); // pila de ids usados (para Borrar)
   const shakeRef = useRef(null);
 
   // Estrellas animadas
   const [stars, setStars] = useState([]);
   const glowAnim = useRef(new Animated.Value(0)).current;
+
+  const q = questions[current];
+  const [letters, setLetters] = useState(() => buildLetterBank(q.target, 3));
+
+  // Regenera el banco al cambiar de pregunta
+  useEffect(() => {
+    setLetters(buildLetterBank(q.target, 3));
+    setProgress('');
+    setUsedStack([]);
+  }, [current]);
 
   useEffect(() => {
     Animated.loop(
@@ -85,25 +131,39 @@ export default function TranslateWordGame() {
     outputRange: ['#ffa94d', '#ff9b31ff'],
   });
 
-  const q = questions[current];
+  // Manejo de click en letra
+  const handleLetter = (item) => {
+    if (modalVisible || item.used) return;
+    const expected = q.target.toUpperCase()[progress.length];
+    if (item.char === expected) {
+      // marcar usada
+      setLetters((prev) =>
+        prev.map((l) => (l.id === item.id ? { ...l, used: true } : l))
+      );
+      setProgress((p) => p + item.char);
+      setUsedStack((st) => [...st, item.id]);
 
-  // ✅ Lógica corregida: solo agrega letras correctas
-  const handleLetter = (letter) => {
-    const expected = q.target[progress.length];
-    if (letter === expected) {
-      const next = progress + letter;
-      setProgress(next);
-      if (next.length === q.target.length) {
-        setModalVisible(true);
+      const nextLen = progress.length + 1;
+      if (nextLen === q.target.length) {
+        // palabra completa
+        setTimeout(() => setModalVisible(true), 200);
       }
     } else {
-      if (shakeRef.current) shakeRef.current.shake(800);
+      if (shakeRef.current) shakeRef.current.shake(700);
     }
+  };
+
+  const handleBackspace = () => {
+    if (!progress.length || !usedStack.length) return;
+    const lastId = usedStack[usedStack.length - 1];
+    // liberar la última letra usada
+    setLetters((prev) => prev.map((l) => (l.id === lastId ? { ...l, used: false } : l)));
+    setUsedStack((st) => st.slice(0, -1));
+    setProgress((p) => p.slice(0, -1));
   };
 
   const nextQuestion = () => {
     setModalVisible(false);
-    setProgress("");
     setCurrent((prev) => (prev + 1) % questions.length);
   };
 
@@ -137,7 +197,7 @@ export default function TranslateWordGame() {
         source={{ uri: q.image }}
         style={styles.image}
         resizeMode="cover"
-        onError={() => console.log("Error cargando imagen")}
+        onError={() => console.log('Error cargando imagen')}
       />
 
       {/* Subtítulo */}
@@ -147,32 +207,51 @@ export default function TranslateWordGame() {
 
       {/* Guiones */}
       <View style={styles.blanksContainer}>
-        {q.target.split("").map((_, i) => (
+        {q.target.toUpperCase().split('').map((_, i) => (
           <View key={i} style={styles.blank}>
-            <Text style={styles.blankText}>{progress[i] || "_"}</Text>
+            <Text style={styles.blankText}>{progress[i] || '_'}</Text>
           </View>
         ))}
       </View>
 
       {/* Letras */}
       <Animatable.View ref={shakeRef} style={styles.lettersContainer}>
-        {q.letters.map((letter, idx) => (
+        {letters.map((l) => (
           <TouchableOpacity
-            key={idx}
-            style={styles.letterBtn}
-            onPress={() => handleLetter(letter)}
-            disabled={modalVisible}
+            key={l.id}
+            style={[styles.letterBtn, l.used && styles.letterBtnUsed]}
+            onPress={() => handleLetter(l)}
+            disabled={modalVisible || l.used}
           >
-            <Text style={styles.letterText}>{letter}</Text>
+            <Text style={[styles.letterText, l.used && styles.letterTextUsed]}>{l.char}</Text>
           </TouchableOpacity>
         ))}
       </Animatable.View>
+
+      {/* Controles */}
+      <View style={styles.controlsRow}>
+        <TouchableOpacity style={[styles.ctrlBtn, styles.backBtn]} onPress={handleBackspace}>
+          <Text style={styles.ctrlText}>Borrar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.ctrlBtn, styles.resetBtn]}
+          onPress={() => {
+            // resetear progreso y liberar letras usadas
+            setProgress('');
+            setLetters((prev) => prev.map((l) => ({ ...l, used: false })));
+            setUsedStack([]);
+          }}
+        >
+          <Text style={styles.ctrlText}>Reiniciar</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Modal de éxito */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <Animatable.View animation="zoomIn" duration={500} style={[styles.popup, styles.correct]}>
             <Text style={styles.modalTitle}>¡Excelente!</Text>
+            <Text style={styles.solvedWord}>{q.target.toUpperCase()}</Text>
             <TouchableOpacity style={styles.btn} onPress={nextQuestion}>
               <Text style={styles.btnText}>Siguiente</Text>
             </TouchableOpacity>
@@ -239,7 +318,7 @@ const styles = StyleSheet.create({
   blanksContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 15,
+    marginBottom: 12,
     flexWrap: 'wrap',
   },
   blank: {
@@ -270,10 +349,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 2,
   },
+  letterBtnUsed: {
+    opacity: 0.35,
+  },
   letterText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#4e342e',
+    fontFamily: 'Comic Sans MS',
+  },
+  letterTextUsed: {
+    textDecorationLine: 'line-through',
+  },
+  controlsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 6,
+  },
+  ctrlBtn: {
+    backgroundColor: '#ffe57f',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    elevation: 2,
+  },
+  ctrlText: {
+    color: '#8d6200',
+    fontWeight: 'bold',
+    fontSize: 16,
     fontFamily: 'Comic Sans MS',
   },
   modalOverlay: {
@@ -287,14 +392,20 @@ const styles = StyleSheet.create({
     padding: 28,
     borderRadius: 20,
     alignItems: 'center',
-    width: 280,
+    width: 300,
     elevation: 10,
   },
   modalTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: 8,
     color: '#13c26e',
+    fontFamily: 'Comic Sans MS',
+  },
+  solvedWord: {
+    fontSize: 18,
+    marginBottom: 12,
+    color: '#333',
     fontFamily: 'Comic Sans MS',
   },
   btn: {
@@ -302,7 +413,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 18,
     paddingVertical: 8,
-    marginTop: 8,
+    marginTop: 4,
   },
   btnText: {
     color: '#8d6200',

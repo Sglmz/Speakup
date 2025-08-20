@@ -1,65 +1,104 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Animated, Dimensions } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import AnimatedBackground from '../components/AnimatedBackground';
+import Svg, { Polygon } from 'react-native-svg';
 import CategoryCard from '../components/CategoryCard';
+import { API_URL } from '../config';
 
-const categories = [
-  { title: '1 2 3', description: 'Learn the numbers', sub: 'Aprende los números', color: '#FFD54F' },
-  { title: 'ABC', description: 'Learn the letters', sub: 'Aprende las letras', color: '#FF8A65' },
-  { title: 'HELLO!', description: 'Learn words', sub: 'Aprende palabras', color: '#F48FB1' },
-  { title: 'Colors', description: 'Learn the colors', sub: 'Aprende los colores', color: '#A1887F' },
-  { title: 'Animals', description: 'Learn the animals', sub: 'Aprende los animales', color: '#81C784' },
-];
+const { width, height } = Dimensions.get('window');
+const STAR_COUNT = 80;
+
+const categoryScreens = {
+  1: 'AnimalGameIntro',
+  2: 'ColorGameIntro',
+  3: 'FoodGameIntroScreen',
+  4: 'HouseGameIntro',
+  5: 'LettersGameIntro',
+  6: 'NumberGameIntro',
+  7: 'WordsGameIntroScreen'
+};
+
 
 export default function HomeScreen({ navigation, route }) {
+  const userId = route?.params?.userId ?? null;
+  const username = route?.params?.username ?? '';
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [stars, setStars] = useState([]);
+
+  useEffect(() => {
+    const gen = Array.from({ length: STAR_COUNT }, () => ({
+      x: Math.random() * width,
+      translateY: new Animated.Value(-50 - Math.random() * height),
+      speed: Math.random() * 5000 + 3000
+    }));
+    gen.forEach(({ translateY, speed }) => {
+      const anim = () => {
+        translateY.setValue(-50 - Math.random() * height * 0.5);
+        Animated.timing(translateY, { toValue: height + 50, duration: speed, useNativeDriver: true }).start(anim);
+      };
+      anim();
+    });
+    setStars(gen);
+  }, []);
+
+  useEffect(() => {
+  fetch(`${API_URL}get_categories.php`)
+    .then(res => res.json())
+    .then(json => {
+      if (json.status === "success") setCategories(json.categories);
+    })
+    .catch(err => console.error("❌ Error cargando categorías:", err))
+    .finally(() => setLoading(false));
+}, []);
+
   return (
-    <View style={styles.container} key={route?.key}>
-      <AnimatedBackground />
-      <ScrollView contentContainerStyle={styles.scroll}>
+    <View style={styles.c} key={route?.key}>
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        {stars.map((s, i) => (
+          <Animated.View key={i} style={[styles.s, { left: s.x, transform: [{ translateY: s.translateY }] }]}>
+            <Svg height="100" width="100" viewBox="0 0 40 40">
+              <Polygon points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8" fill="#FFF59D" opacity={0.3 + Math.random() * 0.7} />
+            </Svg>
+          </Animated.View>
+        ))}
+      </View>
+
+      <ScrollView contentContainerStyle={styles.sv}>
         <Animatable.Text animation="bounceInDown" delay={200} style={styles.logo}>
-          <Text style={styles.s}>S</Text>
-          <Text style={styles.p}>P</Text>
-          <Text style={styles.e}>E</Text>
-          <Text style={styles.a}>A</Text>
-          <Text style={styles.k}>K</Text>
-          <Text style={styles.u}>U</Text>
-          <Text style={styles.p2}>P</Text>
+          {['S', 'P', 'E', 'A', 'K', 'U', 'P'].map((l, i) => (
+            <Text key={i} style={[styles.l, styles[`c${i}`]]}>{l}</Text>
+          ))}
         </Animatable.Text>
 
         <Animatable.Text animation="fadeIn" delay={600} style={styles.level}>
           Nivel actual: <Text style={styles.inicial}>Inicial</Text>
         </Animatable.Text>
 
-        <View style={styles.grid}>
-          {categories.map((cat, i) => (
-            <CategoryCard
-              key={i}
-              delay={800 + i * 200}
-              title={cat.title}
-              description={cat.description}
-              sub={cat.sub}
-              color={cat.color}
-              onPress={() => {
-                if (cat.title === 'Animals') {
-                  navigation.navigate('AnimalGameIntro', { progress: 0 });
-                } else if (cat.title === '1 2 3') {
-                  navigation.navigate('NumberGameIntro', { progress: 0 });
-                } else if (cat.title === 'ABC') {
-                  navigation.navigate('LettersGameIntro', { progress: 0 });
-                } else if (cat.title === 'HELLO!') {
-                  navigation.navigate('WordsGameIntroScreen', { progress: 0 });
-                } else if (cat.title === 'Colors') {
-                  navigation.navigate('ColorGameIntro', { progress: 0 });
-                }
-              }}
-            />
-          ))}
-        </View>
+        {loading ? (
+          <ActivityIndicator size="large" color="#000" />
+        ) : (
+          <View style={styles.grid}>
+            {categories.slice(0, 5).map((cat, i) => (
+              <CategoryCard
+                key={cat.id}
+                delay={800 + i * 200}
+                title={cat.name}
+                description={cat.description}
+                sub={`Learn about ${cat.name.toLowerCase()}`}
+                color={['#FFD54F', '#FF8A65', '#F48FB1', '#A1887F', '#81C784'][i % 5]}
+                onPress={() => {
+                  const screen = categoryScreens[cat.id] || 'WordsGameIntroScreen';
+                  navigation.navigate(screen, { userId, username, categoria: cat.id });
+                }}
+              />
+            ))}
+          </View>
+        )}
 
         <Animatable.View animation="fadeInUp" delay={600}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Todas')}>
-            <Text style={styles.buttonText}>Ver todas las categorías</Text>
+          <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Todas', { userId, username })}>
+            <Text style={styles.btnText}>Ver todas las categorías</Text>
           </TouchableOpacity>
         </Animatable.View>
       </ScrollView>
@@ -68,62 +107,16 @@ export default function HomeScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFEB3B',
-  },
-  scroll: {
-    alignItems: 'center',
-    paddingTop: 80,
-    paddingBottom: 100,
-  },
-  logo: {
-    fontSize: 60,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    flexDirection: 'row',
-    fontFamily: 'Comic Sans MS',
-  },
-  s: { color: '#ffab00', fontSize: 60 },
-  p: { color: '#ffab00', fontSize: 60 },
-  e: { color: '#ff3d00', fontSize: 60 },
-  a: { color: '#2962ff', fontSize: 60 },
-  k: { color: '#ffffff', fontSize: 60 },
-  u: { color: '#ffab00', fontSize: 60 },
-  p2: { color: '#ffab00', fontSize: 60 },
-  level: {
-    fontSize: 18,
-    marginVertical: 0,
-    fontFamily: 'Comic Sans MS',
-  },
-  inicial: {
-    fontWeight: 'bold',
-    color: '#455A64',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginHorizontal: 10,
-  },
-  button: {
-    backgroundColor: '#3F51B5',
-    paddingVertical: 10,
-    paddingHorizontal: 25,
-    borderRadius: 20,
-    marginTop: 30,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontFamily: 'Comic Sans MS',
-  },
-  userPanelButton: {
-    backgroundColor: '#FFAB00',
-    marginTop: 15,
-  },
-  userPanelButtonText: {
-    color: '#222',
-    fontWeight: 'bold',
-  },
+  c: { flex: 1, backgroundColor: '#FFEB3B' },
+  sv: { alignItems: 'center', paddingTop: 80, paddingBottom: 100 },
+  s: { position: 'absolute', justifyContent: 'center', alignItems: 'center' },
+  l: { fontSize: 60, fontFamily: 'Comic Sans MS' },
+  c0: { color: '#ffab00' }, c1: { color: '#ffab00' }, c2: { color: '#ff3d00' },
+  c3: { color: '#2962ff' }, c4: { color: '#fff' }, c5: { color: '#ffab00' }, c6: { color: '#ffab00' },
+  logo: { flexDirection: 'row', marginBottom: 20 },
+  level: { fontSize: 18, fontFamily: 'Comic Sans MS', color: '#4f2c04' },
+  inicial: { fontWeight: 'bold', color: '#455A64' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginHorizontal: 10 },
+  btn: { backgroundColor: '#3F51B5', paddingVertical: 10, paddingHorizontal: 25, borderRadius: 20, marginTop: 30 },
+  btnText: { color: '#fff', fontSize: 16, fontFamily: 'Comic Sans MS' }
 });

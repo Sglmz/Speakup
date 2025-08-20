@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AnimatedBackground from '../../../components/AnimatedBackground';
 import * as Animatable from 'react-native-animatable';
 
-export default function HouseGameIntro({ navigation, route }) {
+export default function FoodGameIntro({ navigation, route }) {
   const progress = route?.params?.progress ?? 0;
 
   return (
@@ -13,15 +13,15 @@ export default function HouseGameIntro({ navigation, route }) {
 
       <View style={styles.content}>
         <Animatable.View animation="fadeInDown" delay={100}>
-          <Icon name="home-variant" size={80} color="#81C784" style={{ marginBottom: 30 }} />
+          <Icon name="food" size={80} color="#FF7043" style={{ marginBottom: 30 }} />
         </Animatable.View>
 
         <Animatable.Text animation="fadeInDown" delay={300} style={styles.title}>
-          Tu casa en inglés
+          Mundo de Comida
         </Animatable.Text>
 
         <Animatable.Text animation="fadeInUp" delay={500} style={styles.subtitle}>
-          ¿Listo para aprender las partes de tu casa en inglés?
+          ¿Listo para aprender sobre los alimentos en inglés?
         </Animatable.Text>
 
         <Animatable.View animation="fadeInUp" delay={800} style={styles.progressBox}>
@@ -31,7 +31,7 @@ export default function HouseGameIntro({ navigation, route }) {
         <Animatable.View animation="fadeInUp" delay={1100}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate('AllHouseGamesScreen', { categoria: 'house' })}
+            onPress={() => navigation.navigate('AllFoodGamesScreen', { categoria: 'food' })}
             activeOpacity={0.85}
           >
             <Text style={styles.buttonText}>¡Empezar!</Text>
@@ -45,7 +45,7 @@ export default function HouseGameIntro({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFEB3B',
+    backgroundColor: '#FFF3E0',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Comic Sans MS',
     fontSize: 40,
-    color: '#388E3C',
+    color: '#E64A19',
     fontWeight: 'bold',
     marginBottom: 12,
     letterSpacing: 1,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   progressBox: {
-    backgroundColor: '#fffde7',
+    backgroundColor: '#ffe0b2',
     borderRadius: 18,
     paddingVertical: 12,
     paddingHorizontal: 35,
@@ -84,14 +84,14 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   progressText: {
-    color: '#388E3C',
+    color: '#E64A19',
     fontFamily: 'Comic Sans MS',
     fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#388E3C',
+    backgroundColor: '#E64A19',
     paddingVertical: 15,
     paddingHorizontal: 60,
     borderRadius: 20,
