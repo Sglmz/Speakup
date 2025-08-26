@@ -1,181 +1,111 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Modal,
-  Dimensions,
-  Animated,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Dimensions } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Svg, { Polygon } from 'react-native-svg';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { API_URL } from '../../../config';
 
 const { width, height } = Dimensions.get('window');
 const STAR_COUNT = 80;
 
-// Utilidades
-const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const TranslateWordGame = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { userId, username, categoria, gameId } = route.params ?? {};
 
-// Crear un banco de letras que SIEMPRE incluye todas las letras (con repeticiones) del target.
-// Agrega N distractores y baraja.
-function buildLetterBank(target, extraCount = 3) {
-  const t = target.toUpperCase();
-  const base = t.split(''); // incluye duplicados
-  const setInTarget = new Set(base);
+  const sentences = [
+    { original: 'Mi casa es bonita', translation: ['my', 'house', 'is', 'beautiful'] },
+    { original: 'La sala es grande', translation: ['the', 'living', 'room', 'is', 'big'] },
+    { original: 'La cocina es moderna', translation: ['the', 'kitchen', 'is', 'modern'] }
+  ];
 
-  // Generar distractores que no estén repetidos en exceso
-  const candidates = ALPHABET.filter((c) => !setInTarget.has(c));
-  const extras = [];
-  for (let i = 0; i < extraCount && candidates.length > 0; i++) {
-    const idx = Math.floor(Math.random() * candidates.length);
-    extras.push(candidates.splice(idx, 1)[0]);
-  }
-
-  const combined = [...base, ...extras].map((char, i) => ({
-    id: `${char}-${i}-${Math.random().toString(36).slice(2, 7)}`,
-    char,
-    used: false,
-  }));
-
-  // Fisher-Yates shuffle
-  for (let i = combined.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [combined[i], combined[j]] = [combined[j], combined[i]];
-  }
-  return combined;
-}
-
-export default function TranslateWordGame() {
-  const questions = useMemo(
-    () => [
-      {
-        sentence: 'She plays guitar in the',
-        translation: 'Ella toca guitarra en la sala',
-        target: 'LIVINGROOM', // L I V I N G R O O M (10)
-        image:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQynKd7-nYOz9wFCSbAfPBPqikX2YvR-Bpf2A&s',
-      },
-      {
-        sentence: 'He cooks in the',
-        translation: 'Él cocina en la cocina',
-        target: 'KITCHEN', // 7
-        image:
-          'https://img.freepik.com/premium-vector/kitchen-with-stove-oven-stove-window_1025542-70867.jpg',
-      },
-      {
-        sentence: 'I sleep in the',
-        translation: 'Yo duermo en el dormitorio',
-        target: 'BEDROOM', // B E D R O O M (7)
-        image:
-          'https://t3.ftcdn.net/jpg/02/00/48/10/360_F_200481040_e36DewfQr2xDonN5IOQxGgFUsoZSqHiK.jpg',
-      },
-    ],
-    []
-  );
-
-  const [current, setCurrent] = useState(0);
-  const [progress, setProgress] = useState(''); // lo ya armado
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [shuffled, setShuffled] = useState([]);
+  const [selected, setSelected] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [usedStack, setUsedStack] = useState([]); // pila de ids usados (para Borrar)
-  const shakeRef = useRef(null);
-
-  // Estrellas animadas
+  const [isCorrect, setIsCorrect] = useState(false);
   const [stars, setStars] = useState([]);
-  const glowAnim = useRef(new Animated.Value(0)).current;
-
-  const q = questions[current];
-  const [letters, setLetters] = useState(() => buildLetterBank(q.target, 3));
-
-  // Regenera el banco al cambiar de pregunta
-  useEffect(() => {
-    setLetters(buildLetterBank(q.target, 3));
-    setProgress('');
-    setUsedStack([]);
-  }, [current]);
 
   useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, { toValue: 1, duration: 1500, useNativeDriver: false }),
-        Animated.timing(glowAnim, { toValue: 0, duration: 1500, useNativeDriver: false }),
-      ])
-    ).start();
-  }, []);
+    generateShuffled();
+    generateStars();
+  }, [currentIndex]);
 
-  useEffect(() => {
-    const generatedStars = Array.from({ length: STAR_COUNT }, () => ({
+  const generateShuffled = () => {
+    const current = sentences[currentIndex].translation;
+    const shuffled = [...current].sort(() => Math.random() - 0.5);
+    setShuffled(shuffled);
+    setSelected([]);
+  };
+
+  const generateStars = () => {
+    const starData = Array.from({ length: STAR_COUNT }, () => ({
       x: Math.random() * width,
       translateY: new Animated.Value(-50 - Math.random() * height),
-      speed: Math.random() * 5000 + 3000,
+      speed: Math.random() * 5000 + 3000
     }));
-
-    generatedStars.forEach(({ translateY, speed }) => {
-      const animate = () => {
+    starData.forEach(({ translateY, speed }) => {
+      const anim = () => {
         translateY.setValue(-50 - Math.random() * height * 0.5);
         Animated.timing(translateY, {
           toValue: height + 50,
           duration: speed,
-          useNativeDriver: true,
-        }).start(animate);
+          useNativeDriver: true
+        }).start(anim);
       };
-      animate();
+      anim();
     });
+    setStars(starData);
+  };
 
-    setStars(generatedStars);
-  }, []);
+  const handleSelect = (word) => {
+    if (selected.includes(word)) return;
+    const newSelected = [...selected, word];
+    setSelected(newSelected);
 
-  const glowColor = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['#ffa94d', '#ff9b31ff'],
-  });
+    if (newSelected.length === sentences[currentIndex].translation.length) {
+      const isCorrect = newSelected.join(' ') === sentences[currentIndex].translation.join(' ');
+      setIsCorrect(isCorrect);
+      setModalVisible(true);
 
-  // Manejo de click en letra
-  const handleLetter = (item) => {
-    if (modalVisible || item.used) return;
-    const expected = q.target.toUpperCase()[progress.length];
-    if (item.char === expected) {
-      // marcar usada
-      setLetters((prev) =>
-        prev.map((l) => (l.id === item.id ? { ...l, used: true } : l))
-      );
-      setProgress((p) => p + item.char);
-      setUsedStack((st) => [...st, item.id]);
-
-      const nextLen = progress.length + 1;
-      if (nextLen === q.target.length) {
-        // palabra completa
-        setTimeout(() => setModalVisible(true), 200);
+      if (isCorrect && currentIndex === sentences.length - 1 && userId && gameId) {
+        fetch(`${API_URL}guardar_progreso.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userId, game_id: gameId })
+        })
+          .then(res => res.json())
+          .then(json => console.log("✔️ Progreso guardado:", json))
+          .catch(err => console.error("❌ Error al guardar progreso:", err));
       }
-    } else {
-      if (shakeRef.current) shakeRef.current.shake(700);
     }
   };
 
-  const handleBackspace = () => {
-    if (!progress.length || !usedStack.length) return;
-    const lastId = usedStack[usedStack.length - 1];
-    // liberar la última letra usada
-    setLetters((prev) => prev.map((l) => (l.id === lastId ? { ...l, used: false } : l)));
-    setUsedStack((st) => st.slice(0, -1));
-    setProgress((p) => p.slice(0, -1));
+  const handleNext = () => {
+    setModalVisible(false);
+    if (isCorrect) {
+      if (currentIndex < sentences.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      } else {
+        navigation.replace('AllHouseGamesScreen', {
+          userId,
+          username,
+          categoria
+        }); // ✅ Evita regresar al juego
+      }
+    } else {
+      setSelected([]);
+    }
   };
 
-  const nextQuestion = () => {
-    setModalVisible(false);
-    setCurrent((prev) => (prev + 1) % questions.length);
-  };
+  const currentSentence = sentences[currentIndex];
 
   return (
     <View style={styles.container}>
-      {/* Fondo estrellas */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        {stars.map((star, i) => (
-          <Animated.View
-            key={i}
-            style={[styles.star, { left: star.x, transform: [{ translateY: star.translateY }] }]}
-          >
+        {stars.map((s, i) => (
+          <Animated.View key={i} style={[styles.star, { left: s.x, transform: [{ translateY: s.translateY }] }]}>
             <Svg height="100" width="100" viewBox="0 0 40 40">
               <Polygon
                 points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8"
@@ -187,242 +117,68 @@ export default function TranslateWordGame() {
         ))}
       </View>
 
-      {/* Título */}
-      <Animated.Text style={[styles.title, { backgroundColor: glowColor }]}>
-        Ordenar Oraciones
-      </Animated.Text>
+      <Animatable.Text animation="fadeInDown" style={styles.question}>
+        Traduce: "{currentSentence.original}"
+      </Animatable.Text>
 
-      {/* Imagen */}
-      <Image
-        source={{ uri: q.image }}
-        style={styles.image}
-        resizeMode="cover"
-        onError={() => console.log('Error cargando imagen')}
-      />
-
-      {/* Subtítulo */}
-      <Text style={styles.subtitle}>Traduce lo restante a inglés:</Text>
-      <Text style={styles.sentence}>{q.sentence}</Text>
-      <Text style={styles.translation}>{q.translation}</Text>
-
-      {/* Guiones */}
-      <View style={styles.blanksContainer}>
-        {q.target.toUpperCase().split('').map((_, i) => (
-          <View key={i} style={styles.blank}>
-            <Text style={styles.blankText}>{progress[i] || '_'}</Text>
+      <View style={styles.selectionContainer}>
+        {selected.map((word, i) => (
+          <View key={i} style={styles.selectedWord}>
+            <Text style={styles.wordText}>{word}</Text>
           </View>
         ))}
       </View>
 
-      {/* Letras */}
-      <Animatable.View ref={shakeRef} style={styles.lettersContainer}>
-        {letters.map((l) => (
+      <View style={styles.optionsContainer}>
+        {shuffled.map((word, i) => (
           <TouchableOpacity
-            key={l.id}
-            style={[styles.letterBtn, l.used && styles.letterBtnUsed]}
-            onPress={() => handleLetter(l)}
-            disabled={modalVisible || l.used}
+            key={i}
+            style={[styles.wordButton, selected.includes(word) && styles.disabled]}
+            onPress={() => handleSelect(word)}
+            disabled={selected.includes(word)}
           >
-            <Text style={[styles.letterText, l.used && styles.letterTextUsed]}>{l.char}</Text>
+            <Text style={styles.wordText}>{word}</Text>
           </TouchableOpacity>
         ))}
-      </Animatable.View>
-
-      {/* Controles */}
-      <View style={styles.controlsRow}>
-        <TouchableOpacity style={[styles.ctrlBtn, styles.backBtn]} onPress={handleBackspace}>
-          <Text style={styles.ctrlText}>Borrar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.ctrlBtn, styles.resetBtn]}
-          onPress={() => {
-            // resetear progreso y liberar letras usadas
-            setProgress('');
-            setLetters((prev) => prev.map((l) => ({ ...l, used: false })));
-            setUsedStack([]);
-          }}
-        >
-          <Text style={styles.ctrlText}>Reiniciar</Text>
-        </TouchableOpacity>
       </View>
 
-      {/* Modal de éxito */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
-          <Animatable.View animation="zoomIn" duration={500} style={[styles.popup, styles.correct]}>
-            <Text style={styles.modalTitle}>¡Excelente!</Text>
-            <Text style={styles.solvedWord}>{q.target.toUpperCase()}</Text>
-            <TouchableOpacity style={styles.btn} onPress={nextQuestion}>
-              <Text style={styles.btnText}>Siguiente</Text>
+          <Animatable.View
+            animation="bounceIn"
+            duration={500}
+            style={[styles.modalContent, isCorrect ? styles.correct : styles.incorrect]}
+          >
+            <Text style={styles.modalText}>
+              {isCorrect ? '✅ ¡Correcto!' : '❌ Intenta de nuevo'}
+            </Text>
+            <TouchableOpacity onPress={handleNext} style={styles.modalButton}>
+              <Text style={styles.buttonText}>{isCorrect ? 'Siguiente' : 'Reintentar'}</Text>
             </TouchableOpacity>
           </Animatable.View>
         </View>
       </Modal>
     </View>
   );
-}
+};
+
+export default TranslateWordGame;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFEB3B',
-    paddingTop: 20,
-  },
-  star: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#4f2c04',
-    textAlign: 'center',
-    padding: 10,
-    borderRadius: 14,
-    fontFamily: 'Comic Sans MS',
-    marginBottom: 10,
-    marginHorizontal: 20,
-    elevation: 3,
-  },
-  image: {
-    width: 220,
-    height: 180,
-    alignSelf: 'center',
-    marginBottom: 10,
-    borderRadius: 12,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 5,
-    fontFamily: 'Comic Sans MS',
-    color: '#ff4081',
-  },
-  sentence: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#5d4037',
-    marginTop: 4,
-    fontFamily: 'Comic Sans MS',
-  },
-  translation: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 10,
-    fontFamily: 'Comic Sans MS',
-  },
-  blanksContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 12,
-    flexWrap: 'wrap',
-  },
-  blank: {
-    borderBottomWidth: 3,
-    borderColor: '#333',
-    width: 32,
-    marginHorizontal: 4,
-    alignItems: 'center',
-  },
-  blankText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    fontFamily: 'Comic Sans MS',
-  },
-  lettersContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
-    marginTop: 5,
-  },
-  letterBtn: {
-    backgroundColor: '#FFD54F',
-    width: (width - 120) / 6,
-    paddingVertical: 10,
-    margin: 5,
-    borderRadius: 10,
-    alignItems: 'center',
-    elevation: 2,
-  },
-  letterBtnUsed: {
-    opacity: 0.35,
-  },
-  letterText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4e342e',
-    fontFamily: 'Comic Sans MS',
-  },
-  letterTextUsed: {
-    textDecorationLine: 'line-through',
-  },
-  controlsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-    marginTop: 8,
-    marginBottom: 6,
-  },
-  ctrlBtn: {
-    backgroundColor: '#ffe57f',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    elevation: 2,
-  },
-  ctrlText: {
-    color: '#8d6200',
-    fontWeight: 'bold',
-    fontSize: 16,
-    fontFamily: 'Comic Sans MS',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  popup: {
-    backgroundColor: '#fff',
-    padding: 28,
-    borderRadius: 20,
-    alignItems: 'center',
-    width: 300,
-    elevation: 10,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#13c26e',
-    fontFamily: 'Comic Sans MS',
-  },
-  solvedWord: {
-    fontSize: 18,
-    marginBottom: 12,
-    color: '#333',
-    fontFamily: 'Comic Sans MS',
-  },
-  btn: {
-    backgroundColor: '#ffe57f',
-    borderRadius: 10,
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-    marginTop: 4,
-  },
-  btnText: {
-    color: '#8d6200',
-    fontWeight: 'bold',
-    fontSize: 16,
-    fontFamily: 'Comic Sans MS',
-  },
-  correct: {
-    borderWidth: 2,
-    borderColor: '#13c26e',
-  },
+  container: { flex: 1, backgroundColor: '#FFEB3B', paddingTop: 40 },
+  star: { position: 'absolute' },
+  question: { fontSize: 24, fontWeight: 'bold', color: '#4E342E', marginBottom: 20, textAlign: 'center', fontFamily: 'Comic Sans MS' },
+  selectionContainer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 20 },
+  selectedWord: { backgroundColor: '#FFF176', borderRadius: 16, padding: 10, margin: 5 },
+  optionsContainer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
+  wordButton: { backgroundColor: '#FFD54F', borderRadius: 16, padding: 10, margin: 5 },
+  disabled: { opacity: 0.5 },
+  wordText: { fontSize: 18, color: '#4E342E', fontWeight: 'bold', fontFamily: 'Comic Sans MS' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { backgroundColor: '#fff', padding: 32, borderRadius: 24, alignItems: 'center', width: 280 },
+  correct: { borderColor: '#13c26e', borderWidth: 2 },
+  incorrect: { borderColor: '#c21b13', borderWidth: 2 },
+  modalText: { fontSize: 20, fontWeight: 'bold', marginBottom: 14, color: '#333', textAlign: 'center', fontFamily: 'Comic Sans MS' },
+  modalButton: { backgroundColor: '#ffe57f', borderRadius: 12, paddingHorizontal: 20, paddingVertical: 10 },
+  buttonText: { color: '#8d6200', fontWeight: 'bold', fontSize: 18, fontFamily: 'Comic Sans MS' }
 });

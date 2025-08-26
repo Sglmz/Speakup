@@ -1,4 +1,4 @@
-// SpellWordScreen.js
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, Dimensions, Animated } from 'react-native';
 import * as Animatable from 'react-native-animatable';

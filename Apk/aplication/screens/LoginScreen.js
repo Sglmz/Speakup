@@ -125,13 +125,6 @@ export default function LoginScreen({ navigation, route }) {
           onChangeText={setPassword}
         />
       </Animatable.View>
-
-      <Animatable.View animation="fadeInUp" delay={950}>
-        <TouchableOpacity onPress={() => {}}>
-          <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-        </TouchableOpacity>
-      </Animatable.View>
-
       <Animatable.View animation="fadeInUp" delay={1150}>
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Entrar</Text>

@@ -4,7 +4,7 @@ import * as Animatable from 'react-native-animatable';
 import CategoryCard from '../../../components/CategoryCard';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Polygon } from 'react-native-svg';
-import { API_URL } from '../config';
+import { API_URL } from '../../../config';
 
 const { width, height } = Dimensions.get('window'), STAR_COUNT = 80;
 

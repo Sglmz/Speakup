@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Animated, Dimensions, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Animatable from 'react-native-animatable';
 import Svg, { Polygon } from 'react-native-svg';
-import { API_URL } from '../config';
+import { API_URL } from '../../../config';
+import { WebView } from 'react-native-webview';
 
 const { width, height } = Dimensions.get('window'), STAR_COUNT = 80;
 
 export default function WordsGameIntro({ navigation, route }) {
-  const userId = route?.params?.userId ?? null, username = route?.params?.username ?? '', categoria = route?.params?.categoria ?? null;
-  const [progress, setProgress] = useState(0), [loading, setLoading] = useState(true), [stars, setStars] = useState([]);
+  const userId = route?.params?.userId ?? null,
+        username = route?.params?.username ?? '',
+        categoria = route?.params?.categoria ?? null;
+        
+  const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [stars, setStars] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [claseVista, setClaseVista] = useState(false);
 
   useEffect(() => {
     const gen = Array.from({ length: STAR_COUNT }, () => ({
@@ -28,13 +36,13 @@ export default function WordsGameIntro({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-  if (!userId || !categoria) return console.warn('Faltan datos en WordsGameIntro:', route?.params), setLoading(false);
-  fetch(`${API_URL}ver_progreso.php?userId=${userId}&categoria=${categoria}`)
-    .then(res => res.json())
-    .then(json => json.status === "success" ? setProgress(json.progress) : console.warn("Error en progreso:", json.message))
-    .catch(err => console.error("❌ Error al obtener progreso:", err))
-    .finally(() => setLoading(false));
-}, [userId, categoria]);
+    if (!userId || !categoria) return console.warn('Faltan datos en WordsGameIntro:', route?.params), setLoading(false);
+    fetch(`${API_URL}ver_progreso.php?userId=${userId}&categoria=${categoria}`)
+      .then(res => res.json())
+      .then(json => json.status === "success" ? setProgress(json.progress) : console.warn("Error en progreso:", json.message))
+      .catch(err => console.error("❌ Error al obtener progreso:", err))
+      .finally(() => setLoading(false));
+  }, [userId, categoria]);
 
   return (
     <View style={s.c} key={route?.key}>
@@ -53,18 +61,55 @@ export default function WordsGameIntro({ navigation, route }) {
           <Icon name="format-letter-case" size={80} color="#81C784" style={{ marginBottom: 30 }} />
         </Animatable.View>
         <Animatable.Text animation="fadeInDown" delay={300} style={s.t}>Palabras</Animatable.Text>
-        <Animatable.Text animation="fadeInUp" delay={500} style={s.sT}>¿Listo para aprender nuevas palabras en inglés?</Animatable.Text>
+        <Animatable.Text animation="fadeInUp" delay={500} style={s.sT}>
+          ¿Listo para aprender nuevas palabras en inglés?
+        </Animatable.Text>
 
         <Animatable.View animation="fadeInUp" delay={800} style={s.pB}>
           {loading ? <ActivityIndicator size="small" color="#388E3C" /> : <Text style={s.pT}>Progreso: {progress}%</Text>}
         </Animatable.View>
 
+        <Animatable.Text animation="fadeInUp" delay={1000} style={s.explicacion}>
+          ¡Primero mira la clase! Luego podrás jugar 🎮
+        </Animatable.Text>
+
         <Animatable.View animation="fadeInUp" delay={1100}>
-          <TouchableOpacity style={s.b} onPress={() => navigation.navigate('AllWordsScreen', { userId, username, progress, categoria })} activeOpacity={0.85}>
+          <TouchableOpacity style={[s.b, { backgroundColor: '#fff', borderWidth: 2, borderColor: '#388E3C', marginBottom: 15 }]} onPress={() => setModalVisible(true)}>
+            <Text style={[s.bT, { color: '#388E3C' }]}>Ver clase</Text>
+          </TouchableOpacity>
+        </Animatable.View>
+
+        <Animatable.View animation="fadeInUp" delay={1300}>
+          <TouchableOpacity
+            style={[s.b, { opacity: claseVista ? 1 : 0.4 }]}
+            onPress={() => claseVista && navigation.navigate('AllWordsScreen', { userId, username, progress, categoria })}
+            activeOpacity={claseVista ? 0.85 : 1}
+            disabled={!claseVista}
+          >
             <Text style={s.bT}>¡Empezar!</Text>
           </TouchableOpacity>
         </Animatable.View>
       </View>
+
+      <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: '#000' }}>
+          <WebView
+            javaScriptEnabled={true}
+            source={{ uri: 'https://www.youtube.com/embed/9Qf82loawzg?autoplay=1&controls=1&modestbranding=1' }}
+            onMessage={() => {}}
+          />
+          <TouchableOpacity
+            style={s.modalBtn}
+            onPress={() => {
+              setClaseVista(true);
+              setModalVisible(false);
+            }}
+          >
+            <Icon name="check-circle" size={24} color="#fff" style={{ marginRight: 10 }} />
+            <Text style={s.modalBtnText}>¡Ya vi la clase, quiero jugar!</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -75,8 +120,23 @@ const s = StyleSheet.create({
   v: { flex: 1, justifyContent: 'center', alignItems: 'center', width: '100%', paddingHorizontal: 40 },
   t: { fontFamily: 'Comic Sans MS', fontSize: 40, color: '#388E3C', fontWeight: 'bold', marginBottom: 12, letterSpacing: 1 },
   sT: { fontFamily: 'Comic Sans MS', fontSize: 18, color: '#444', marginBottom: 30, textAlign: 'center' },
-  pB: { backgroundColor: '#fffde7', borderRadius: 18, paddingVertical: 12, paddingHorizontal: 35, marginBottom: 32, elevation: 2 },
+  explicacion: { fontFamily: 'Comic Sans MS', fontSize: 18, color: '#222', textAlign: 'center', marginBottom: 15 },
+  pB: { backgroundColor: '#fffde7', borderRadius: 18, paddingVertical: 12, paddingHorizontal: 35, marginBottom: 25, elevation: 2 },
   pT: { color: '#388E3C', fontFamily: 'Comic Sans MS', fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
   b: { backgroundColor: '#388E3C', paddingVertical: 15, paddingHorizontal: 60, borderRadius: 20, elevation: 3 },
-  bT: { color: '#fff', fontFamily: 'Comic Sans MS', fontSize: 22, fontWeight: 'bold', textAlign: 'center', letterSpacing: 1 }
+  bT: { color: '#fff', fontFamily: 'Comic Sans MS', fontSize: 22, fontWeight: 'bold', textAlign: 'center', letterSpacing: 1 },
+  modalBtn: {
+    backgroundColor: '#4CAF50',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+  },
+  modalBtnText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    fontFamily: 'Comic Sans MS',
+  }
 });

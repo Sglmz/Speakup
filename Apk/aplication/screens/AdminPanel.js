@@ -17,7 +17,6 @@ export default function AdminPanelScreen({ navigation }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fondo animado
   useEffect(() => {
     const generatedStars = Array.from({ length: STAR_COUNT }, () => ({
       x: Math.random() * width,
@@ -45,14 +44,14 @@ export default function AdminPanelScreen({ navigation }) {
       .finally(() => setLoading(false));
   }, []);
 
-  // Filtrar búsqueda
+  // Validación segura para evitar errores si username no está definido
   const filtered = users.filter(u =>
-    u.nombre.toLowerCase().includes(search.toLowerCase())
+    typeof u.username === 'string' &&
+    u.username.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <View style={styles.container}>
-      {/* Fondo animado */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         {stars.map((star, i) => (
           <Animated.View
@@ -70,7 +69,6 @@ export default function AdminPanelScreen({ navigation }) {
         ))}
       </View>
 
-      {/* Contenido principal */}
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <Animatable.View animation="fadeInDown" delay={100} style={styles.header}>
           <Icon name="shield-account" size={80} color="#F57C00" />
@@ -99,13 +97,18 @@ export default function AdminPanelScreen({ navigation }) {
                 delay={400 + index * 100}
                 style={styles.userCard}
               >
-                <Text style={styles.userName}>{user.nombre}</Text>
+                <Text style={styles.userName}>{user.username}</Text>
                 <Text style={styles.userLastSeen}>
                   Última vez que ingresó: {user.ultimoIngreso ?? "Nunca"}
                 </Text>
                 <TouchableOpacity
                   style={styles.progressButton}
-                  onPress={() => navigation.navigate("UserProgressScreen", { userId: user.id })}
+                  onPress={() =>
+                    navigation.navigate("UserPanel", {
+                      userId: user.id,
+                      username: user.username
+                    })
+                  }
                 >
                   <Text style={styles.progressButtonText}>Ver Progreso</Text>
                 </TouchableOpacity>
@@ -126,12 +129,37 @@ const styles = StyleSheet.create({
   header: { alignItems: 'center', marginBottom: 20 },
   title: { fontFamily: 'Comic Sans MS', fontSize: 34, color: '#F57C00', fontWeight: 'bold' },
   subtitle: { fontFamily: 'Comic Sans MS', fontSize: 16, color: '#444', textAlign: 'center', marginTop: 5 },
-  searchBox: { backgroundColor: '#fffde7', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 10, marginVertical: 20, width: '100%', maxWidth: 600, elevation: 2 },
+  searchBox: {
+    backgroundColor: '#fffde7',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginVertical: 20,
+    width: '100%',
+    maxWidth: 600,
+    elevation: 2
+  },
   searchInput: { fontFamily: 'Comic Sans MS', fontSize: 16, color: '#333' },
   userList: { width: '100%', maxWidth: 600 },
-  userCard: { backgroundColor: '#fff', borderRadius: 16, padding: 18, marginBottom: 15, elevation: 3 },
+  userCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 15,
+    elevation: 3
+  },
   userName: { fontFamily: 'Comic Sans MS', fontSize: 20, color: '#F57C00', fontWeight: 'bold' },
   userLastSeen: { fontFamily: 'Comic Sans MS', fontSize: 14, color: '#777', marginVertical: 8 },
-  progressButton: { alignSelf: 'flex-start', backgroundColor: '#F57C00', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 12 },
-  progressButtonText: { color: '#fff', fontFamily: 'Comic Sans MS', fontSize: 14 },
+  progressButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#F57C00',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 12
+  },
+  progressButtonText: {
+    color: '#fff',
+    fontFamily: 'Comic Sans MS',
+    fontSize: 14
+  },
 });
