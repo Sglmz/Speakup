@@ -11,7 +11,14 @@ if (!$category_id) {
 }
 
 try {
-  $stmt = $pdo->prepare("SELECT id, name, description FROM games WHERE category_id = ?");
+  // get_games.php
+$stmt = $pdo->prepare("
+  SELECT id, name, description, code AS ruta
+  FROM games
+  WHERE category_id = ?
+  ORDER BY id
+");
+
   $stmt->execute([$category_id]);
   $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

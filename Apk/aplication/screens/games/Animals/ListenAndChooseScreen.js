@@ -69,7 +69,7 @@ export default function ListenAndChooseScreen({ navigation }) {
 
     (async () => {
       const { sound } = await Audio.Sound.createAsync(
-        require('../../../assets/dog.gif')
+        require('../../../assets/dog.wav')
       );
       setSound(sound);
     })();

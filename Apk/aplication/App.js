@@ -38,6 +38,26 @@ import LettersGameIntro from './screens/games/Letters/LettersGameIntroScreen';
 import CountTapGameScreen from './screens/games/Numbers/CountTapGameScreen';
 import TranslateWordGame from './screens/games/house/OrderSentenceGame';
 
+// IMPORTS (rutas según tus carpetas del screenshot)
+import HouseMemoryGame from './screens/games/house/HouseMemoryGame';
+import HouseWhichRoomGame from './screens/games/house/HouseWhichRoomGame';
+import HouseSpotItGame from './screens/games/house/HouseSpotItGame';
+
+import ColorsStroopGame from './screens/games/Colors/ColorsStroopGame';
+import ColorsMixGame from './screens/games/Colors/ColorsMixGame';
+import ColorsSimonGame from './screens/games/Colors/ColorsSimonGame';
+
+import NumbersSumPickGame from './screens/games/Numbers/NumbersSumPickGame';
+import NumbersCountGame from './screens/games/Numbers/NumbersCountGame';
+import NumbersEvenOddGame from './screens/games/Numbers/NumbersEvenOddGame';
+
+import WordsHangmanLiteGame from './screens/games/words/WordsHangmanLiteGame';
+import WordsUnscrambleGame from './screens/games/words/WordsUnscrambleGame';
+import WordsMissingLetterGame from './screens/games/words/WordsMissingLetterGame';
+
+
+
+
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -92,6 +112,23 @@ export default function App() {
         <Stack.Screen name="AnimalGameScreen" component={AnimalGameScreen} options={{ headerTitle: () => <HeaderTitle text="Juego de Animales" /> }} />
         <Stack.Screen name="AnimalScreen2" component={AnimalScreen2} options={{ headerTitle: () => <HeaderTitle text="Juego de Animales 2" /> }} />
         <Stack.Screen name="ListenAndChooseScreen" component={ListenAndChooseScreen} options={{ headerTitle: () => <HeaderTitle text="Escuchar y Elegir" /> }} />
+
+          // STACK.SCREENS (nombres EXACTOS = code/ruta)
+<Stack.Screen name="HouseMemoryGame" component={HouseMemoryGame} />
+<Stack.Screen name="HouseWhichRoomGame" component={HouseWhichRoomGame} />
+<Stack.Screen name="HouseSpotItGame" component={HouseSpotItGame} />
+
+<Stack.Screen name="ColorsStroopGame" component={ColorsStroopGame} />
+<Stack.Screen name="ColorsMixGame" component={ColorsMixGame} />
+<Stack.Screen name="ColorsSimonGame" component={ColorsSimonGame} />
+
+<Stack.Screen name="NumbersSumPickGame" component={NumbersSumPickGame} />
+<Stack.Screen name="NumbersCountGame" component={NumbersCountGame} />
+<Stack.Screen name="NumbersEvenOddGame" component={NumbersEvenOddGame} />
+
+<Stack.Screen name="WordsHangmanLiteGame" component={WordsHangmanLiteGame} />
+<Stack.Screen name="WordsUnscrambleGame" component={WordsUnscrambleGame} />
+<Stack.Screen name="WordsMissingLetterGame" component={WordsMissingLetterGame} />
 
         {/* Números */}
         <Stack.Screen name="NumberGameIntro" component={NumberGameIntroScreen} options={{ headerTitle: () => <HeaderTitle text="Números" /> }} />
