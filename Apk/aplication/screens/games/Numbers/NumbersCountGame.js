@@ -3,7 +3,8 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { saveProgress } from '../../../utils/apiProgress';
-import Sprite from './Sprite';
+import Sprite from '../../../Sprite';
+
 
 const ICONS = ['apple','star','ball'];
 const TOTAL_ROUNDS = 8;

@@ -3,7 +3,8 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { saveProgress } from '../../../utils/apiProgress';
-import Sprite from './Sprite';
+import Sprite from '../../../Sprite';
+
 
 function makeSeq(len=10){
   return Array.from({length:len},()=>1+Math.floor(Math.random()*99));
