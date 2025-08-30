@@ -1,4 +1,4 @@
-import { API_URL } from '../config';
+import { API_URL } from '../../config';
 
 export function apiBase() {
   return API_URL.endsWith('/') ? API_URL : `${API_URL}/`;

@@ -4,3 +4,70 @@
 [2025-08-19 23:06:27] 📥 Inicio de ver_progreso
 🔹 user_id recibido: '5'
 ✅ Progreso enviado correctamente
+[2025-08-29 05:01:54] Datos recibidos: null
+[2025-08-29 05:01:54] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 05:01:54] Datos recibidos: {"user_id":"5","game_id":"26"}
+[2025-08-29 05:01:54] ✅ Insertado nuevo progreso para user_id: 5 y game_id: 26
+[2025-08-29 05:01:54] ➡️ category_id obtenido: 2
+[2025-08-29 05:01:54] 🎯 Progreso actualizado - Completados: 1 / 4 = 25%
+[2025-08-29 05:02:17] Datos recibidos: null
+[2025-08-29 05:02:17] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 05:02:17] Datos recibidos: {"user_id":"5","game_id":"25"}
+[2025-08-29 05:02:17] ✅ Insertado nuevo progreso para user_id: 5 y game_id: 25
+[2025-08-29 05:02:17] ➡️ category_id obtenido: 2
+[2025-08-29 05:02:17] 🎯 Progreso actualizado - Completados: 2 / 4 = 50%
+[2025-08-29 05:07:08] Datos recibidos: null
+[2025-08-29 05:07:08] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 05:07:08] Datos recibidos: {"user_id":"5","game_id":"6"}
+[2025-08-29 05:07:08] ✅ Insertado nuevo progreso para user_id: 5 y game_id: 6
+[2025-08-29 05:07:08] ➡️ category_id obtenido: 2
+[2025-08-29 05:07:08] 🎯 Progreso actualizado - Completados: 3 / 4 = 75%
+[2025-08-29 18:53:47] Datos recibidos: null
+[2025-08-29 18:53:47] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 18:53:47] Datos recibidos: {"user_id":"5","game_id":"26"}
+[2025-08-29 18:53:47] ℹ️ Progreso ya existía para user_id: 5 y game_id: 26
+[2025-08-29 18:53:47] ➡️ category_id obtenido: 2
+[2025-08-29 18:53:47] 🎯 Progreso actualizado - Completados: 3 / 4 = 75%
+[2025-08-29 18:56:41] Datos recibidos: null
+[2025-08-29 18:56:41] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 18:56:41] Datos recibidos: {"user_id":"5","game_id":"25"}
+[2025-08-29 18:56:41] ℹ️ Progreso ya existía para user_id: 5 y game_id: 25
+[2025-08-29 18:56:41] ➡️ category_id obtenido: 2
+[2025-08-29 18:56:41] 🎯 Progreso actualizado - Completados: 3 / 4 = 75%
+[2025-08-29 19:00:39] Datos recibidos: null
+[2025-08-29 19:00:39] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 19:00:39] Datos recibidos: {"user_id":"5","game_id":"27"}
+[2025-08-29 19:00:39] ✅ Insertado nuevo progreso para user_id: 5 y game_id: 27
+[2025-08-29 19:00:39] ➡️ category_id obtenido: 2
+[2025-08-29 19:00:39] 🎯 Progreso actualizado - Completados: 4 / 4 = 100%
+[2025-08-29 19:04:00] Datos recibidos: null
+[2025-08-29 19:04:00] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 19:04:00] Datos recibidos: {"user_id":"5","game_id":"23"}
+[2025-08-29 19:04:00] ✅ Insertado nuevo progreso para user_id: 5 y game_id: 23
+[2025-08-29 19:04:00] ➡️ category_id obtenido: 4
+[2025-08-29 19:04:00] 🎯 Progreso actualizado - Completados: 1 / 4 = 25%
+[2025-08-29 19:09:37] 📥 Inicio de ver_progreso
+🔹 user_id recibido: '5'
+✅ Progreso enviado correctamente
+[2025-08-29 19:23:00] Datos recibidos: null
+[2025-08-29 19:23:00] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 19:23:00] Datos recibidos: {"user_id":"5","game_id":"31"}
+[2025-08-29 19:23:00] ✅ Insertado nuevo progreso para user_id: 5 y game_id: 31
+[2025-08-29 19:23:00] ➡️ category_id obtenido: 7
+[2025-08-29 19:23:00] 🎯 Progreso actualizado - Completados: 2 / 4 = 50%
+[2025-08-29 19:23:29] Datos recibidos: null
+[2025-08-29 19:23:29] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 19:23:29] Datos recibidos: {"user_id":"5","game_id":"33"}
+[2025-08-29 19:23:29] ✅ Insertado nuevo progreso para user_id: 5 y game_id: 33
+[2025-08-29 19:23:29] ➡️ category_id obtenido: 7
+[2025-08-29 19:23:29] 🎯 Progreso actualizado - Completados: 3 / 4 = 75%
+[2025-08-29 19:23:32] Datos recibidos: {"user_id":"5","game_id":"33"}
+[2025-08-29 19:23:32] ℹ️ Progreso ya existía para user_id: 5 y game_id: 33
+[2025-08-29 19:23:32] ➡️ category_id obtenido: 7
+[2025-08-29 19:23:32] 🎯 Progreso actualizado - Completados: 3 / 4 = 75%
+[2025-08-29 19:23:52] Datos recibidos: null
+[2025-08-29 19:23:52] ❌ Faltan datos - user_id:  | game_id: 
+[2025-08-29 19:23:52] Datos recibidos: {"user_id":"5","game_id":"33"}
+[2025-08-29 19:23:52] ℹ️ Progreso ya existía para user_id: 5 y game_id: 33
+[2025-08-29 19:23:52] ➡️ category_id obtenido: 7
+[2025-08-29 19:23:52] 🎯 Progreso actualizado - Completados: 3 / 4 = 75%

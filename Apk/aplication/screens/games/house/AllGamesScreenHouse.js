@@ -6,12 +6,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Polygon } from 'react-native-svg';
 import { API_URL } from '../../../config';
 
-const { width, height } = Dimensions.get('window'), STAR_COUNT = 80;
+const { width, height } = Dimensions.get('window');
+const STAR_COUNT = 80;
 
 export default function AllHouseGamesScreen({ route, navigation }) {
   const { userId, username, categoria } = route?.params || {};
-  const insets = useSafeAreaInsets(), [games, setGames] = useState([]), [loading, setLoading] = useState(true), [stars, setStars] = useState([]);
+  const insets = useSafeAreaInsets();
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [stars, setStars] = useState([]);
 
+  // ⭐ Animación estrellas
   useEffect(() => {
     const gen = Array.from({ length: STAR_COUNT }, () => ({
       x: Math.random() * width,
@@ -28,16 +33,27 @@ export default function AllHouseGamesScreen({ route, navigation }) {
     setStars(gen);
   }, []);
 
+  // 📡 Fetch juegos de la BD
   useEffect(() => {
     if (!categoria) return console.warn("⚠️ Falta category_id en AllHouseGamesScreen");
     fetch(`${API_URL}get_games.php?category_id=${categoria}`)
       .then(r => r.json())
-      .then(j => j.status === "success" ? setGames(j.games.slice(0, 5)) : console.warn("⚠️ Error al cargar juegos:", j.message))
+      .then(j => {
+        if (j.status === "success") {
+          console.log("🏠 Juegos de Casa recibidos:", j.games);
+          setGames(j.games.slice(0, 5));
+        } else {
+          console.warn("⚠️ Error al cargar juegos:", j.message);
+        }
+      })
       .catch(e => console.error("❌ Error de red:", e))
       .finally(() => setLoading(false));
   }, [categoria]);
 
-  if (!userId || !username || !categoria) console.warn('⚠️ Faltan parámetros en AllHouseGamesScreen:', { userId, username, categoria });
+  if (!userId || !username || !categoria) {
+    console.warn('⚠️ Faltan parámetros en AllHouseGamesScreen:', { userId, username, categoria });
+    return null;
+  }
 
   return (
     <View style={s.c} key={route?.key}>
@@ -55,7 +71,9 @@ export default function AllHouseGamesScreen({ route, navigation }) {
         <Animatable.Text animation="fadeInUp" delay={200} style={s.t}>
           ¡Escoge un juego y diviértete aprendiendo las partes de la casa!
         </Animatable.Text>
-        {loading ? <ActivityIndicator size="large" color="#000" /> : (
+        {loading ? (
+          <ActivityIndicator size="large" color="#000" />
+        ) : (
           <View style={s.g}>
             {games.map((game, i) => (
               <CategoryCard

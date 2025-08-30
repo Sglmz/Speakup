@@ -9,17 +9,6 @@ import { API_URL } from '../../../config';
 const { width, height } = Dimensions.get('window');
 const STAR_COUNT = 80;
 
-// 🧠 Mapa fijo de ID del juego a nombre del screen
-const gameScreens = {
-  3: 'AnimalGameScreen',
-  4: 'ListenAndChooseScreen',
-  6: 'AnimalScreen2',
-  9: 'FoodGame1',
-  13: 'OrderSentenceGame',
-  17: 'CountTapGameScreen',
-  20: 'WordGame1'
-};
-
 export default function AllGamesScreenColors({ route, navigation }) {
   const { userId, username, categoria } = route?.params || {};
   const insets = useSafeAreaInsets();
@@ -27,6 +16,7 @@ export default function AllGamesScreenColors({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [stars, setStars] = useState([]);
 
+  // ⭐ Animación de estrellas
   useEffect(() => {
     const gen = Array.from({ length: STAR_COUNT }, () => ({
       x: Math.random() * width,
@@ -43,11 +33,19 @@ export default function AllGamesScreenColors({ route, navigation }) {
     setStars(gen);
   }, []);
 
+  // 📡 Fetch juegos de la categoría
   useEffect(() => {
     if (!categoria) return console.warn("⚠️ Falta category_id");
     fetch(`${API_URL}get_games.php?category_id=${categoria}`)
       .then(r => r.json())
-      .then(j => j.status === "success" ? setGames(j.games.slice(0, 5)) : console.warn("⚠️ Error:", j.message))
+      .then(j => {
+        if (j.status === "success") {
+          console.log("🎮 Juegos recibidos:", j.games);
+          setGames(j.games.slice(0, 5));
+        } else {
+          console.warn("⚠️ Error:", j.message);
+        }
+      })
       .catch(e => console.error("❌ Error de red:", e))
       .finally(() => setLoading(false));
   }, [categoria]);
@@ -78,30 +76,31 @@ export default function AllGamesScreenColors({ route, navigation }) {
           ¡Escoje un juego y diviértete aprendiendo!
         </Animatable.Text>
 
-        {loading ? <ActivityIndicator size="large" color="#000" /> : (
+        {loading ? (
+          <ActivityIndicator size="large" color="#000" />
+        ) : (
           <View style={s.g}>
-            {games.map((game, i) => {
-              const screenName = gameScreens[game.id];
-              return (
-                <CategoryCard
-                  key={game.id}
-                  title={game.name}
-                  description={game.description}
-                  sub={game.description}
-                  color={['#4DB6AC', '#81C784', '#BA68C8', '#FF7043', '#64B5F6'][i % 5]}
-                  delay={100 + i * 200}
-                  onPress={() => {
-                    if (!screenName) return console.warn(`⚠️ No se encontró pantalla para game.id=${game.id}`);
-                    navigation.navigate(screenName, {
-                      userId,
-                      username,
-                      gameId: game.id,
-                      categoria
-                    });
-                  }}
-                />
-              );
-            })}
+            {games.map((game, i) => (
+              <CategoryCard
+                key={game.id}
+                title={game.name}
+                description={game.description}
+                sub={game.description}
+                color={['#4DB6AC', '#81C784', '#BA68C8', '#FF7043', '#64B5F6'][i % 5]}
+                delay={100 + i * 200}
+                onPress={() => {
+                  if (!game.ruta) {
+                    return console.warn(`⚠️ No se encontró ruta para game.id=${game.id}`);
+                  }
+                  navigation.navigate(game.ruta, {
+                    userId,
+                    username,
+                    gameId: game.id,
+                    categoria
+                  });
+                }}
+              />
+            ))}
           </View>
         )}
       </ScrollView>

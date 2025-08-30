@@ -38,25 +38,25 @@ import LettersGameIntro from './screens/games/Letters/LettersGameIntroScreen';
 import CountTapGameScreen from './screens/games/Numbers/CountTapGameScreen';
 import TranslateWordGame from './screens/games/house/OrderSentenceGame';
 
-// IMPORTS (rutas según tus carpetas del screenshot)
+// Juegos de casa
 import HouseMemoryGame from './screens/games/house/HouseMemoryGame';
 import HouseWhichRoomGame from './screens/games/house/HouseWhichRoomGame';
 import HouseSpotItGame from './screens/games/house/HouseSpotItGame';
 
+// Juegos de colores
 import ColorsStroopGame from './screens/games/Colors/ColorsStroopGame';
 import ColorsMixGame from './screens/games/Colors/ColorsMixGame';
 import ColorsSimonGame from './screens/games/Colors/ColorsSimonGame';
 
+// Juegos de números
 import NumbersSumPickGame from './screens/games/Numbers/NumbersSumPickGame';
 import NumbersCountGame from './screens/games/Numbers/NumbersCountGame';
 import NumbersEvenOddGame from './screens/games/Numbers/NumbersEvenOddGame';
 
+// Juegos de palabras
 import WordsHangmanLiteGame from './screens/games/words/WordsHangmanLiteGame';
 import WordsUnscrambleGame from './screens/games/words/WordsUnscrambleGame';
 import WordsMissingLetterGame from './screens/games/words/WordsMissingLetterGame';
-
-
-
 
 const Stack = createStackNavigator();
 
@@ -91,7 +91,7 @@ export default function App() {
                 onPress={() =>
                   navigation.navigate('UserPanel', {
                     username: route?.params?.username,
-                    userId: route?.params?.userId
+                    userId: route?.params?.userId,
                   })
                 }
                 style={{ marginRight: 18 }}
@@ -113,101 +113,38 @@ export default function App() {
         <Stack.Screen name="AnimalScreen2" component={AnimalScreen2} options={{ headerTitle: () => <HeaderTitle text="Juego de Animales 2" /> }} />
         <Stack.Screen name="ListenAndChooseScreen" component={ListenAndChooseScreen} options={{ headerTitle: () => <HeaderTitle text="Escuchar y Elegir" /> }} />
 
-          // STACK.SCREENS (nombres EXACTOS = code/ruta)
-<Stack.Screen name="HouseMemoryGame" component={HouseMemoryGame} />
-<Stack.Screen name="HouseWhichRoomGame" component={HouseWhichRoomGame} />
-<Stack.Screen name="HouseSpotItGame" component={HouseSpotItGame} />
+        {/* Juegos de Casa */}
+        <Stack.Screen name="HouseMemoryGame" component={HouseMemoryGame} />
+        <Stack.Screen name="HouseWhichRoomGame" component={HouseWhichRoomGame} />
+        <Stack.Screen name="HouseSpotItGame" component={HouseSpotItGame} />
 
-<Stack.Screen name="ColorsStroopGame" component={ColorsStroopGame} />
-<Stack.Screen name="ColorsMixGame" component={ColorsMixGame} />
-<Stack.Screen name="ColorsSimonGame" component={ColorsSimonGame} />
+        {/* Juegos de Colores */}
+        <Stack.Screen name="ColorsStroopGame" component={ColorsStroopGame} />
+        <Stack.Screen name="ColorsMixGame" component={ColorsMixGame} />
+        <Stack.Screen name="ColorsSimonGame" component={ColorsSimonGame} />
 
-<Stack.Screen name="NumbersSumPickGame" component={NumbersSumPickGame} />
-<Stack.Screen name="NumbersCountGame" component={NumbersCountGame} />
-<Stack.Screen name="NumbersEvenOddGame" component={NumbersEvenOddGame} />
+        {/* Juegos de Números */}
+        <Stack.Screen name="NumbersSumPickGame" component={NumbersSumPickGame} />
+        <Stack.Screen name="NumbersCountGame" component={NumbersCountGame} />
+        <Stack.Screen name="NumbersEvenOddGame" component={NumbersEvenOddGame} />
 
-<Stack.Screen name="WordsHangmanLiteGame" component={WordsHangmanLiteGame} />
-<Stack.Screen name="WordsUnscrambleGame" component={WordsUnscrambleGame} />
-<Stack.Screen name="WordsMissingLetterGame" component={WordsMissingLetterGame} />
+        {/* Juegos de Palabras */}
+        <Stack.Screen name="WordsHangmanLiteGame" component={WordsHangmanLiteGame} />
+        <Stack.Screen name="WordsUnscrambleGame" component={WordsUnscrambleGame} />
+        <Stack.Screen name="WordsMissingLetterGame" component={WordsMissingLetterGame} />
 
         {/* Números */}
         <Stack.Screen name="NumberGameIntro" component={NumberGameIntroScreen} options={{ headerTitle: () => <HeaderTitle text="Números" /> }} />
-        <Stack.Screen
-          name="AllGamesScreenNumbers"
-          component={AllGamesScreenNumbers}
-          options={({ navigation, route }) => ({
-            headerTitle: () => <HeaderTitle text="Juegos de Números" />,
-            headerLeft: () => (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.replace('NumberGameIntro', {
-                    userId: route?.params?.userId,
-                    username: route?.params?.username,
-                    categoria: route?.params?.categoria,
-                    progress: route?.params?.progress ?? 0
-                  })
-                }
-                style={{ marginLeft: 15 }}
-                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-              >
-                <Icon name="arrow-left" size={28} color="#FF4081" />
-              </TouchableOpacity>
-            ),
-          })}
-        />
+        <Stack.Screen name="AllGamesScreenNumbers" component={AllGamesScreenNumbers} options={{ headerTitle: () => <HeaderTitle text="Juegos de Números" /> }} />
         <Stack.Screen name="CountTapGameScreen" component={CountTapGameScreen} options={{ headerTitle: () => <HeaderTitle text="Juego de contar" /> }} />
 
         {/* Colores */}
         <Stack.Screen name="ColorGameIntro" component={ColorGameIntro} options={{ headerTitle: () => <HeaderTitle text="Colores" /> }} />
-        <Stack.Screen
-          name="AllGamesScreenColors"
-          component={AllGamesScreenColors}
-          options={({ navigation, route }) => ({
-            headerTitle: () => <HeaderTitle text="Juegos de Colores" />,
-            headerLeft: () => (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.replace('ColorGameIntro', {
-                    userId: route?.params?.userId,
-                    username: route?.params?.username,
-                    categoria: route?.params?.categoria,
-                    progress: route?.params?.progress ?? 0
-                  })
-                }
-                style={{ marginLeft: 15 }}
-                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-              >
-                <Icon name="arrow-left" size={28} color="#FF4081" />
-              </TouchableOpacity>
-            ),
-          })}
-        />
+        <Stack.Screen name="AllGamesScreenColors" component={AllGamesScreenColors} options={{ headerTitle: () => <HeaderTitle text="Juegos de Colores" /> }} />
 
         {/* Casa */}
         <Stack.Screen name="HouseGameIntro" component={HouseGameIntroScreen} options={{ headerTitle: () => <HeaderTitle text="Intro Casa" /> }} />
-        <Stack.Screen
-          name="AllHouseGamesScreen"
-          component={AllGamesScreenHouse}
-          options={({ navigation, route }) => ({
-            headerTitle: () => <HeaderTitle text="Juego sobre tu casa" />,
-            headerLeft: () => (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.replace('HouseGameIntro', {
-                    userId: route?.params?.userId,
-                    username: route?.params?.username,
-                    categoria: route?.params?.categoria,
-                    progress: route?.params?.progress ?? 0
-                  })
-                }
-                style={{ marginLeft: 15 }}
-                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-              >
-                <Icon name="arrow-left" size={28} color="#FF4081" />
-              </TouchableOpacity>
-            ),
-          })}
-        />
+        <Stack.Screen name="AllHouseGamesScreen" component={AllGamesScreenHouse} options={{ headerTitle: () => <HeaderTitle text="Juego sobre tu casa" /> }} />
         <Stack.Screen name="OrderSentenceGame" component={TranslateWordGame} options={{ headerTitle: () => <HeaderTitle text="Ordenar Oraciones" /> }} />
 
         {/* Palabras y Letras */}

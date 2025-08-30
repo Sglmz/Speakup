@@ -5,16 +5,16 @@ import { Image, Text } from 'react-native';
 // Sprite.js (en la raíz)
 const IMAGES = {
   numbers: {
-    apple:  require('./assets/sprites/numbers/apple.png'),
-    star:   require('./assets/sprites/numbers/star.png'),
-    ball:   require('./assets/sprites/numbers/ball.png'),
+    apple:  require('../assets/sprites/words/apple.png'),
+    star:   require('../assets/sprites/words/star.png'),
+    ball:   require('../assets/sprites/words/ball.png'),
   },
   words: {
-    table:  require('./assets/sprites/words/table.png'),
-    chair:  require('./assets/sprites/words/chair.png'),
-    door:   require('./assets/sprites/words/door.png'),
-    window: require('./assets/sprites/words/window.png'),
-    garden: require('./assets/sprites/words/garden.png'),
+    table:  require('../assets/sprites/words/table.png'),
+    chair:  require('../assets/sprites/words/chair.png'),
+    door:   require('../assets/sprites/words/door.png'),
+    window: require('../assets/sprites/words/window.png'),
+    garden: require('../assets/sprites/words/garden.png'),
   },
 };
 const EMOJI = {
